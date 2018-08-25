@@ -53,7 +53,7 @@ public class TestSnake : MonoBehaviour {
         //      }
 
         next = MakePart();
-        next.Init(this, 1);
+        next.Init(this, transform, 1);
         lastInstruction = transform.position;
     }
 	
