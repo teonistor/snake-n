@@ -23,21 +23,24 @@ public class SnakePart : MonoBehaviour {
 	}
 
     public void Instruct (Vector3 destPos, Quaternion destRot) {
-        this.destPos = destPos;
-        this.destRot = destRot;
+        print("Instruct snak p " + partCount + " to go to " + destPos);
         if (next) {
-            next.Instruct(transform.position, transform.rotation);
+            next.Instruct(this.destPos, this.destRot);
         } else if (partCount < MaxParts) {
             next = head.MakePart(transform);
             next.Init(head, partCount + 1);
         }
+
+        this.destPos = destPos;
+        this.destRot = destRot;
     }
 
 	void Update () {
         //print("SnakePart update moving from " + transform.position + " to " + destPos + " by " + head.DeltaMove);
         Vector3 pos = Vector3.MoveTowards(transform.position, destPos, head.DeltaMove);
-        float t = (pos - transform.position).sqrMagnitude / (destPos - transform.position).sqrMagnitude;
-        transform.rotation = Quaternion.Lerp(transform.rotation, destRot, t);
+        //float t = (pos - transform.position).sqrMagnitude / (destPos - transform.position).sqrMagnitude;
+        //transform.rotation = Quaternion.Lerp(transform.rotation, destRot, t);
         transform.position = pos;
+        //transform.position = destPos;
 	}
 }

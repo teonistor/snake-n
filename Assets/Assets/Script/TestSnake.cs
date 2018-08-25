@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class TestSnake : MonoBehaviour {
 
-    static readonly float incr = 0.1f, deltaDistSq = 0.16f;
+    static readonly float incr = 0.1f, deltaDistSq = 0.05f;
     static readonly Vector3 scale = new Vector3(0.41f, 0.41f, 0.06f);
     static readonly Quaternion rot = Quaternion.AngleAxis(45, Vector3.back);
 
@@ -20,7 +20,7 @@ public class TestSnake : MonoBehaviour {
 
     private List<Vector3> pts;
     private List<TestRotate> body;
-    private Vector3 lastPos;
+    private Vector3 lastPos, lastInstruction;
     private SnakePart next;
     
 	void Start () {
@@ -54,7 +54,7 @@ public class TestSnake : MonoBehaviour {
 
         next = MakePart();
         next.Init(this, 1);
-
+        lastInstruction = transform.position;
     }
 	
     public SnakePart MakePart(Transform prevPart = null) {
@@ -78,8 +78,10 @@ public class TestSnake : MonoBehaviour {
         lastPos = transform.position;
 
         //transform.position += new Vector3(speed * Input.GetAxis("Horizontal"), 0f, speed * Input.GetAxis("Vertical"));
-        if ((transform.position - next.transform.position).sqrMagnitude > deltaDistSq)
+        if ((transform.position - lastInstruction).sqrMagnitude > deltaDistSq) {
+            lastInstruction = transform.position;
             next.Instruct(transform.position, transform.rotation);
+        }
     }
 
 	void Update1 () {
@@ -140,6 +142,7 @@ public class TestSnake : MonoBehaviour {
         Vector3 anchor, sinFactor, cosFactor, ea;
         float a, omega;
         int turnFactor;
+        WaitForEndOfFrame wait = new WaitForEndOfFrame();
 
         while (true) {
             if (LeftTurn == RightTurn) {
@@ -152,7 +155,7 @@ public class TestSnake : MonoBehaviour {
 
                 for (a = 0f; a <1f; a += speed * Time.deltaTime) {
                     transform.position = anchor + a * transform.forward;
-                    yield return new WaitForEndOfFrame();
+                    yield return wait;
                 }
                 transform.position = anchor + transform.forward;
 
@@ -173,11 +176,10 @@ public class TestSnake : MonoBehaviour {
 
                 print("Anchor " + anchor + " sinF " + sinFactor + " cosF " + cosFactor + " pos " + transform.position);
 
-
                 for (a = 0f; a < 0.5 * Mathf.PI; a += omega * Time.deltaTime) {
                     transform.position = anchor + Mathf.Cos(a) * cosFactor + Mathf.Sin(a) * sinFactor;
                     transform.eulerAngles = new Vector3(ea.x, ea.y + turnFactor * a * Mathf.Rad2Deg, ea.z);
-                    yield return new WaitForEndOfFrame();
+                    yield return wait;
                 }
                 transform.position = anchor + sinFactor;
                 transform.eulerAngles = new Vector3(ea.x, ea.y + turnFactor * 90f, ea.z);
