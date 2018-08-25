@@ -4,11 +4,12 @@ using UnityEngine;
 
 public class TestSnake : MonoBehaviour {
 
-    static readonly float incr = 0.1f, deltaDistSq = 0.05f;
+    static readonly float incr = 0.1f, deltaDistSq = 0.01f;
     static readonly Vector3 scale = new Vector3(0.41f, 0.41f, 0.06f);
     static readonly Quaternion rot = Quaternion.AngleAxis(45, Vector3.back);
 
     [SerializeField] private Material snake;
+    [SerializeField] private GameObject snakeBodyPart;
     [SerializeField] private int _maxParts = 100;
     [SerializeField] private float speed = 0.9f;
 
@@ -58,7 +59,9 @@ public class TestSnake : MonoBehaviour {
     }
 	
     public SnakePart MakePart(Transform prevPart = null) {
-        GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        if (prevPart == null) prevPart = transform;
+        return Instantiate(snakeBodyPart, prevPart.position, Quaternion.identity).GetComponent<SnakePart>();
+        /*GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
         go.transform.parent = transform.parent;
         if (prevPart == null) {
             go.transform.position = transform.position;
@@ -70,7 +73,7 @@ public class TestSnake : MonoBehaviour {
             go.transform.localRotation = prevPart.rotation;
         }
         go.GetComponent<Renderer>().material = snake;
-        return go.AddComponent<SnakePart>();
+        return go.AddComponent<SnakePart>();*/
     }
 
     void Update () {

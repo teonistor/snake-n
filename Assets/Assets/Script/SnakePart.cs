@@ -37,7 +37,7 @@ public class SnakePart : MonoBehaviour {
 	void Update () {
         //print("SnakePart update moving from " + transform.position + " to " + destPos + " by " + head.DeltaMove);
         Vector3 pos = Vector3.MoveTowards(transform.position, destPos, head.DeltaMove);
-        Vector3 ea = new Vector3(0f, Vector3.SignedAngle(Vector3.forward, previous.position - transform.position, Vector3.up), 0f);
+        Vector3 ea = new Vector3(0f, Vector3.SignedAngle(Vector3.forward, previous.position - (next == null ? transform : next.transform).position, Vector3.up), 0f);
         //float t = (pos - transform.position).sqrMagnitude / (destPos - transform.position).sqrMagnitude;
         //transform.rotation = Quaternion.Lerp(transform.rotation, destRot, t);
         transform.position = pos;
