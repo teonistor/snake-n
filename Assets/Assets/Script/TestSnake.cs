@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class TestSnake : MonoBehaviour {
 
@@ -13,8 +14,39 @@ public class TestSnake : MonoBehaviour {
     [SerializeField] private int _maxParts = 100;
     [SerializeField] private float speed = 0.9f;
 
-    private bool LeftTurn { get { return Input.GetKey(KeyCode.A); } }
-    private bool RightTurn { get { return Input.GetKey(KeyCode.D); } }
+    //private bool LeftTurn {
+    //    get {
+    //        return _leftTurn || Input.GetKey(KeyCode.A);
+    //    } set {
+    //        _leftTurn = value;
+    //    }
+    //}
+    //private bool RightTurn {
+    //    get {
+    //        return _rightTurn || Input.GetKey(KeyCode.D);
+    //    } set {
+    //        _rightTurn = value;
+    //    }
+    //}
+
+    private bool LeftTurn { get {
+        if (Input.GetKey(KeyCode.A)) return true;
+        Rect r = new Rect(0, 0, Screen.width / 2, Screen.height);
+        for (var i=0; i< Input.touchCount; i++) {
+            if (r.Contains(Input.GetTouch(i).position))
+                return true;
+        }
+        return false;
+    } }
+    private bool RightTurn { get {
+        if (Input.GetKey(KeyCode.D)) return true;
+        Rect r = new Rect(Screen.width / 2, 0, Screen.width / 2, Screen.height);
+        for (var i=0; i< Input.touchCount; i++) {
+            if (r.Contains(Input.GetTouch(i).position))
+                return true;
+        }
+        return false;
+    } }
 
     public int MaxParts { get { return _maxParts; } }
     public float DeltaMove { get; private set; }
@@ -23,8 +55,17 @@ public class TestSnake : MonoBehaviour {
     private List<TestRotate> body;
     private Vector3 lastPos, lastInstruction;
     private SnakePart next;
-    
-	void Start () {
+    private bool _rightTurn;
+    private bool _leftTurn;
+
+    public void TouchLeft () {
+        //_leftTurn = true;
+    }
+    public void TouchRight () {
+        //_rightTurn = true;
+    }
+
+    void Start () {
         //leftTurn = rightTurn = false;
         StartCoroutine(Move());
 
@@ -57,8 +98,8 @@ public class TestSnake : MonoBehaviour {
         next.Init(this, transform, 1);
         lastInstruction = transform.position;
     }
-	
-    public SnakePart MakePart(Transform prevPart = null) {
+
+    public SnakePart MakePart (Transform prevPart = null) {
         if (prevPart == null) prevPart = transform;
         return Instantiate(snakeBodyPart, prevPart.position, Quaternion.identity).GetComponent<SnakePart>();
         /*GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -87,11 +128,11 @@ public class TestSnake : MonoBehaviour {
         }
     }
 
-	void Update1 () {
+    void Update1 () {
 
         if (Input.GetKeyDown(KeyCode.LeftArrow)) {
             print("Left");
-            for (int j=0; j<pts.Count; j++) {
+            for (int j = 0; j < pts.Count; j++) {
                 pts[j] = new Vector3(pts[j].z, pts[j].y, -pts[j].x);
             }
         }
@@ -99,12 +140,12 @@ public class TestSnake : MonoBehaviour {
 
 
         int i = 0;
-        for (int j=1; j<pts.Count; j++) {
+        for (int j = 1; j < pts.Count; j++) {
             if (j == pts.Count - 1 || Vector3.Cross(pts[j - 1] - pts[j], pts[j + 1] - pts[j]) == Vector3.zero) {
                 for (float t = 0f; t <= 1f; t += incr) {
                     getBodyPart(i).Instruct(
                         (1 - t) * pts[j - 1] + t * pts[j],
-                        pts[j] - pts[j-1]
+                        pts[j] - pts[j - 1]
                     );
                     i++;
                 }
@@ -121,9 +162,9 @@ public class TestSnake : MonoBehaviour {
                 j++;
             }
         }
-	}
+    }
 
-    private TestRotate getBodyPart(int i) {
+    private TestRotate getBodyPart (int i) {
         if (i < body.Count)
             return body[i];
         else {
@@ -147,31 +188,36 @@ public class TestSnake : MonoBehaviour {
         int turnFactor;
         WaitForEndOfFrame wait = new WaitForEndOfFrame();
 
+        yield return new WaitForSeconds(2f);
+
         while (true) {
             if (LeftTurn == RightTurn) {
-                //leftTurn = rightTurn = false;
+                //LeftTurn = RightTurn = false;
 
                 // Move forward
                 anchor = transform.position;
 
                 print("Anchor " + anchor);
 
-                for (a = 0f; a <1f; a += speed * Time.deltaTime) {
+                for (a = 0f; a < 1f; a += speed * Time.deltaTime) {
                     transform.position = anchor + a * transform.forward;
                     yield return wait;
                 }
                 transform.position = anchor + transform.forward;
 
 
-            } else {
+            }
+            else {
                 omega = 2 * speed; // Angular velocity
                 ea = transform.eulerAngles;
                 sinFactor = transform.forward * 0.5f;
 
                 if (LeftTurn) {
-                    //leftTurn = false;
+                    //LeftTurn = false;
                     turnFactor = -1;
-                } else {
+                }
+                else {
+                    //RightTurn = false;
                     turnFactor = 1;
                 }
                 cosFactor = transform.right * -0.5f * turnFactor;
