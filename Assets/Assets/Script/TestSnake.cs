@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class TestSnake : MonoBehaviour {
@@ -125,6 +126,10 @@ public class TestSnake : MonoBehaviour {
         if ((transform.position - lastInstruction).sqrMagnitude > deltaDistSq) {
             lastInstruction = transform.position;
             next.Instruct(transform.position, transform.rotation);
+        }
+
+        if (Input.GetKey(KeyCode.Escape)) {
+            SceneManager.LoadSceneAsync(0);
         }
     }
 
