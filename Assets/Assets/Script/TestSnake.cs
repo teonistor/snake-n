@@ -13,7 +13,7 @@ public class TestSnake : MonoBehaviour {
     [SerializeField] private Material snake;
     [SerializeField] private GameObject snakeBodyPart;
     [SerializeField] private int _maxParts = 100;
-    [SerializeField] private float speed = 0.9f;
+    [SerializeField] private float speed = 1f;
 
     //private bool LeftTurn {
     //    get {
