@@ -14,7 +14,7 @@ public class MainMenu : MonoBehaviour {
 
     public void ChangeAcceleroSpeed() {
         float f = float.Parse(inputField.text);
-        AcceleroTry.speed = f;
+        GoproAcclr.speed = f;
     }
 
     public void StartGame() {

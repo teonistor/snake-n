@@ -5,7 +5,7 @@ using UnityEngine;
 public class SnakePart : MonoBehaviour {
     static readonly int NO_COLLISION_COUNT = 10;
 
-    private TestSnake head;
+    private SnakeHead head;
     private Vector3 destPos;
     private Quaternion destRot;
     private SnakePart next;
@@ -16,7 +16,7 @@ public class SnakePart : MonoBehaviour {
         return head.MaxParts;
     } }
 
-	public void Init (TestSnake head, Transform previous, int partCount) {
+	public void Init (SnakeHead head, Transform previous, int partCount) {
         this.head = head;
         this.previous = previous;
         this.partCount = partCount;
