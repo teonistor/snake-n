@@ -434,7 +434,7 @@ GameObject:
   - component: {fileID: 783177452}
   - component: {fileID: 783177451}
   - component: {fileID: 783177449}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Head
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -514,7 +514,7 @@ BoxCollider:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 783177447}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
@@ -535,7 +535,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 787505531}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Gopro frame
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -785,7 +785,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1022517936}
   - component: {fileID: 1022517937}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Snake
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1681,7 +1681,7 @@ GameObject:
   - component: {fileID: 1978653826}
   - component: {fileID: 1978653829}
   - component: {fileID: 1978653825}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Gopro
   m_TagString: MainCamera
   m_Icon: {fileID: 0}

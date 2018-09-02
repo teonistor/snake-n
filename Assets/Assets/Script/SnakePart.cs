@@ -3,6 +3,7 @@ using System;
 using UnityEngine;
 
 public class SnakePart : MonoBehaviour {
+    static readonly int NO_COLLISION_COUNT = 10;
 
     private TestSnake head;
     private Vector3 destPos;
@@ -19,6 +20,11 @@ public class SnakePart : MonoBehaviour {
         this.head = head;
         this.previous = previous;
         this.partCount = partCount;
+
+        // Activate self-collision
+        if (partCount > NO_COLLISION_COUNT) {
+            gameObject.layer = 10;
+        }
 	}
 
     public void Instruct (Vector3 destPos, Quaternion destRot) {
@@ -44,4 +50,9 @@ public class SnakePart : MonoBehaviour {
         transform.eulerAngles = ea;
         //transform.position = destPos;
 	}
+
+    void OnTriggerEnter (Collider other) {
+        print("Snake bit its tail");
+        Debug.Break();
+    }
 }
