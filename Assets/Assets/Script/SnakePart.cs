@@ -10,6 +10,7 @@ public class SnakePart : MonoBehaviour {
     private Quaternion destRot;
     private SnakePart next;
     private Transform previous;
+    public bool noInstruction { get; private set; }
     public int partCount { get; private set; }
 
     private int MaxParts { get {
@@ -19,6 +20,7 @@ public class SnakePart : MonoBehaviour {
 	public void Init (SnakeHead head, Transform previous, int partCount) {
         this.head = head;
         this.previous = previous;
+        noInstruction = true;
         this.partCount = partCount;
 
         // Activate self-collision
@@ -28,6 +30,7 @@ public class SnakePart : MonoBehaviour {
 	}
 
     public void Instruct (Vector3 destPos, Quaternion destRot) {
+        noInstruction = false;
         //print("Instruct snak p " + partCount + " to go to " + destPos);
         if (next) {
             next.Instruct(this.destPos, this.destRot);
@@ -41,6 +44,13 @@ public class SnakePart : MonoBehaviour {
     }
 
 	void Update () {
+        if (MaxParts < partCount) {
+            Destroy(gameObject);
+            return;
+        }
+
+        if (noInstruction) return;
+
         //print("SnakePart update moving from " + transform.position + " to " + destPos + " by " + head.DeltaMove);
         Vector3 pos = Vector3.MoveTowards(transform.position, destPos, head.DeltaMove);
         Vector3 ea = new Vector3(0f, Vector3.SignedAngle(Vector3.right, previous.position - (next == null ? transform : next.transform).position, Vector3.up), 0f);
@@ -53,6 +63,6 @@ public class SnakePart : MonoBehaviour {
 
     void OnTriggerEnter (Collider other) {
         print("Snake bit its tail");
-        Debug.Break();
+        head.Die();
     }
 }

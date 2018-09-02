@@ -52,7 +52,7 @@ public class SnakeHead : MonoBehaviour {
     public int MaxParts { get { return _maxParts; } }
     public float DeltaMove { get; private set; }
 
-    private List<Vector3> pts;
+    //private List<Vector3> pts;
     private Vector3 lastPos, lastInstruction;
     private SnakePart next;
     private bool _rightTurn;
@@ -69,13 +69,13 @@ public class SnakeHead : MonoBehaviour {
         //leftTurn = rightTurn = false;
         StartCoroutine(Move());
 
-        pts = new List<Vector3> {
-            new Vector3(0, 0.6f, 0),
-            new Vector3(0, 0.6f, -1),
-            new Vector3(0, 0.6f, -2),
-            new Vector3(1, 0.6f, -2),
-            new Vector3(1, 0.6f, -3)
-        };
+        //pts = new List<Vector3> {
+        //    new Vector3(0, 0.6f, 0),
+        //    new Vector3(0, 0.6f, -1),
+        //    new Vector3(0, 0.6f, -2),
+        //    new Vector3(1, 0.6f, -2),
+        //    new Vector3(1, 0.6f, -3)
+        //};
        
         lastPos = transform.position;
         next = MakePart();
@@ -154,5 +154,28 @@ public class SnakeHead : MonoBehaviour {
                 transform.eulerAngles = new Vector3(ea.x, ea.y + turnFactor * 90f, ea.z);
             }
         }
+    }
+
+    public void Die() {
+        StartCoroutine(DeathAnimation());
+    }
+
+    private IEnumerator DeathAnimation() {
+        speed = 0f;
+        WaitForSeconds wait = new WaitForSeconds(0.033333f);
+
+        int originalPartCount = _maxParts;
+        for (float t = 1f; t >= 0f; t -= 0.066666f) {
+            _maxParts = (int)(t * originalPartCount);
+            yield return wait;
+        }
+        _maxParts = 0;
+
+        Vector3 originalScale = transform.localScale;
+        for (float t = 1f; t >= 0f; t -= 0.066666f) {
+            transform.localScale = t * originalScale;
+            yield return wait;
+        }
+        Destroy(gameObject);
     }
 }
