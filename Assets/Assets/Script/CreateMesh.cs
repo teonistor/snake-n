@@ -5,41 +5,30 @@ using UnityEngine;
 [RequireComponent(typeof(MeshRenderer), typeof(MeshFilter))]
 public class CreateMesh : MonoBehaviour {
 
-    [SerializeField] private float d = 0.1f, D = 0.15f, l = 0.12f;
-    [SerializeField] private Material material;
+    [SerializeField] private float r = 0.13f, d = 0.15f, l = 0.11f;
 
     private MeshFilter filter;
-    private float defer = 0;
+    //private float defer = 0;
 
     void Start () {
         filter = GetComponent<MeshFilter>();
-        SnakePart p = GetComponent<SnakePart>();
-        if (p != null) defer = p.partCount * 0.3f;
-    }
-	
-    void LateUpdate () {
-        d = 0.1f + 0.03f * Mathf.Sin(Time.time * 2 + defer);
-        D = 0.12f + 0.04f * Mathf.Sin(Time.time* 2 + defer);
-    }
-
-	void Update () {
 
         Mesh mesh = new Mesh();
         mesh.name = "Snake Part";
 
         mesh.vertices = new Vector3[] {
-            new Vector3(-l,  d, 0f),
-            new Vector3(-l, 0f,  d),
-            new Vector3(-l, -d, 0f),
-            new Vector3(-l, 0f, -d),
-            new Vector3(0f,  D, 0f),
-            new Vector3(0f, 0f,  D),
-            new Vector3(0f, -D, 0f),
-            new Vector3(0f, 0f, -D),
-            new Vector3( l,  d, 0f),
-            new Vector3( l, 0f,  d),
-            new Vector3( l, -d, 0f),
-            new Vector3( l, 0f, -d)
+            new Vector3(-l,  r, 0f),
+            new Vector3(-l, 0f,  r),
+            new Vector3(-l, -r, 0f),
+            new Vector3(-l, 0f, -r),
+            new Vector3(0f,  d, 0f),
+            new Vector3(0f, 0f,  d),
+            new Vector3(0f, -d, 0f),
+            new Vector3(0f, 0f, -d),
+            new Vector3( l,  r, 0f),
+            new Vector3( l, 0f,  r),
+            new Vector3( l, -r, 0f),
+            new Vector3( l, 0f, -r)
         };
         mesh.uv = new Vector2[] {
             new Vector2(  0f, 0f),
@@ -78,5 +67,17 @@ public class CreateMesh : MonoBehaviour {
         mesh.RecalculateBounds();
 
         filter.mesh = mesh;
+
+        //SnakePart p = GetComponent<SnakePart>();
+        //if (p != null) defer = p.partCount * 0.3f;
+    }
+	
+    //void LateUpdate () {
+    //    d = 0.1f + 0.03f * Mathf.Sin(Time.time * 2 + defer);
+    //    D = 0.12f + 0.04f * Mathf.Sin(Time.time* 2 + defer);
+    //}
+
+	void Update () {
+
     }
 }
