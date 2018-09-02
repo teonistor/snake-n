@@ -2,16 +2,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(MeshRenderer))]
+[RequireComponent(typeof(MeshRenderer), typeof(MeshFilter))]
 public class CreateMesh : MonoBehaviour {
 
-    static readonly float d = 0.1f, D = 0.15f, l = 0.12f;
+    [SerializeField] private float d = 0.1f, D = 0.15f, l = 0.12f;
     [SerializeField] private Material material;
 
-    // Use this for initialization
+    private MeshFilter filter;
+
+
     void Start () {
-        MeshRenderer renderer = GetComponent<MeshRenderer>();
-        MeshFilter filter = GetComponent<MeshFilter>();
+        filter = GetComponent<MeshFilter>();
+    }
+	
+	void Update () {
 
         Mesh mesh = new Mesh();
         mesh.name = "Snake Part";
@@ -67,11 +71,5 @@ public class CreateMesh : MonoBehaviour {
         mesh.RecalculateBounds();
 
         filter.mesh = mesh;
-        renderer.material = material;
     }
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
 }
