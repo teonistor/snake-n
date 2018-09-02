@@ -135,7 +135,7 @@ Light:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 209527667}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 8
   m_Type: 1
   m_Color: {r: 1, g: 0.95686275, b: 0.8392157, a: 1}
@@ -822,7 +822,7 @@ MonoBehaviour:
   snake: {fileID: 2100000, guid: a8c5c5bc48fab9c479c47d8ae06bbedb, type: 2}
   snakeBodyPart: {fileID: 1615548701129792, guid: 604d799d5faa8ce439039bca9321922a,
     type: 2}
-  _maxParts: 20
+  _maxParts: 50
   speed: 0.9
 --- !u!1 &1255168761
 GameObject:
