@@ -9,7 +9,7 @@ public class SnakePart : MonoBehaviour {
     private Quaternion destRot;
     private SnakePart next;
     private Transform previous;
-    private int partCount;
+    public int partCount { get; private set; }
 
     private int MaxParts { get {
         return head.MaxParts;

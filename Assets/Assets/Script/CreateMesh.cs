@@ -9,12 +9,19 @@ public class CreateMesh : MonoBehaviour {
     [SerializeField] private Material material;
 
     private MeshFilter filter;
-
+    private float defer = 0;
 
     void Start () {
         filter = GetComponent<MeshFilter>();
+        SnakePart p = GetComponent<SnakePart>();
+        if (p != null) defer = p.partCount * 0.3f;
     }
 	
+    void LateUpdate () {
+        d = 0.1f + 0.03f * Mathf.Sin(Time.time * 2 + defer);
+        D = 0.12f + 0.04f * Mathf.Sin(Time.time* 2 + defer);
+    }
+
 	void Update () {
 
         Mesh mesh = new Mesh();
