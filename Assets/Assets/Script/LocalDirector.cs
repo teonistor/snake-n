@@ -26,7 +26,7 @@ public class LocalDirector : MonoBehaviour {
         currentLevel = new LevelSection[currentLevelDef.Length, currentLevelDef[0].Length];
         print("Initialising level " + 1 + " of size " + currentLevelDef.Length + " x " + currentLevelDef[0].Length);
 
-        Debug.Break();
+        //Debug.Break();
     }
 
     public Transform SnakeHeadEnters (int x, int z) {

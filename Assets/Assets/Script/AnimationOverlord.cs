@@ -40,6 +40,7 @@ public class AnimationOverlord : MonoBehaviour {
         //animation.AddClip()
 
         movementCode = 30; // Arbitrary?
+        nextZ = 1; // As above
         EndOfTile();
 	}
 	
@@ -53,8 +54,10 @@ public class AnimationOverlord : MonoBehaviour {
         //animation.clip = clips[Random.Range(0, clips.Length)];
 
         if (ahead == null) {
+            currentX = nextX;
+            currentZ = nextZ;
             GenerateMovementCodeAndNextXZ();
-            transform.parent = LocalDirector.Instance.SnakeHeadEnters(nextX, nextZ);
+            transform.parent = LocalDirector.Instance.SnakeHeadEnters(currentX, currentZ);
             animation.clip = GetAppropriateClip();
             currentX = nextX;
             currentZ = nextZ;
@@ -69,7 +72,9 @@ public class AnimationOverlord : MonoBehaviour {
 
     private void GenerateMovementCodeAndNextXZ() {
         // TODO use input
-        int exitVia = (Random.Range(1, 4) + movementCode / 10 - 1) % 4 + 1;
+        sthEnum.MoveNext();
+        int exitVia = sthEnum.Current;// (Random.Range(1, 4) + movementCode / 10 - 1) % 4 + 1;
+
         movementCode += exitVia;
         switch(exitVia) {
             case 1: nextZ++; break;
@@ -80,8 +85,30 @@ public class AnimationOverlord : MonoBehaviour {
         }
     }
 
+    IEnumerator<int> sthEnum = sth();
+
+    private static IEnumerator<int> sth() {
+        yield return 1;
+        yield return 1;
+        yield return 1;
+        yield return 2;
+        yield return 2;
+        yield return 2;
+        yield return 2;
+        yield return 3;
+        yield return 3;
+        yield return 3;
+        yield return 2;
+        yield return 2;
+        yield return 2;
+        yield return 3;
+        yield return 3;
+        yield return 3;
+        while (true) yield return 4;
+    }
+
     private AnimationClip GetAppropriateClip() {
-        print("Movement code " + movementCode);
+        //print("Movement code " + movementCode);
         switch(movementCode) {
             case 21: return clips[0];
             case 23: return clips[1];
