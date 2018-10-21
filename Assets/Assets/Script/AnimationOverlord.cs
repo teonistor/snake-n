@@ -11,7 +11,7 @@ public class AnimationOverlord : MonoBehaviour {
     [SerializeField] private GameObject another;
 
     // TODO hack
-    static int howMany = 10;
+    static int howMany = 30;
     bool couldMakeAnother = true;
     AnimationOverlord ahead = null;
 
@@ -22,6 +22,30 @@ public class AnimationOverlord : MonoBehaviour {
     public int currentZ { get; private set; }
     public int nextX { get; private set; }
     public int nextZ { get; private set; }
+
+    // Controls
+    private int LeftTurn {
+        get {
+            if (Input.GetKey(KeyCode.A)) return -1;
+            Rect r = new Rect(0, 0, Screen.width / 2, Screen.height);
+            for (var i = 0; i < Input.touchCount; i++) {
+                if (r.Contains(Input.GetTouch(i).position))
+                    return -1;
+            }
+            return 0;
+        }
+    }
+    private int RightTurn {
+        get {
+            if (Input.GetKey(KeyCode.D)) return 1;
+            Rect r = new Rect(Screen.width / 2, 0, Screen.width / 2, Screen.height);
+            for (var i = 0; i < Input.touchCount; i++) {
+                if (r.Contains(Input.GetTouch(i).position))
+                    return 1;
+            }
+            return 0;
+        }
+    }
 
 
     /******
@@ -71,9 +95,10 @@ public class AnimationOverlord : MonoBehaviour {
     }
 
     private void GenerateMovementCodeAndNextXZ() {
-        // TODO use input
-        sthEnum.MoveNext();
-        int exitVia = sthEnum.Current;// (Random.Range(1, 4) + movementCode / 10 - 1) % 4 + 1;
+        // TODO pre-/post-level action
+        //sthEnum.MoveNext();
+        //int exitVia = sthEnum.Current;// (Random.Range(1, 4) + movementCode / 10 - 1) % 4 + 1;
+        int exitVia = (movementCode / 10 + 1 + LeftTurn + RightTurn) % 4 + 1;
 
         movementCode += exitVia;
         switch(exitVia) {
