@@ -69,8 +69,8 @@ public class LocalDirector : MonoBehaviour {
     private void CheckVieweingRadiusPreconditions () {
         // Anti-stupid
         if (Mathf.Min(currentLevel.GetLength(0), currentLevel.GetLength(1)) < 2 * viewRadius + 1)
-            Debug.LogWarning("Current level too small for given view radius");
+            Debug.LogWarning("Current level too small for given view radius" + viewRadius);
         if (viewRadius < 0)
-            Debug.LogWarning("Negative view radius makes no sense");
+            Debug.LogWarning("Negative view radius " + viewRadius + " makes no sense");
     }
 }
