@@ -17,8 +17,8 @@ public class LevelSection : MonoBehaviour {
         this.j = j;
 
         switch(d) {
-            case 'o': GetComponent<Renderer>().material = m2; break;
-            default : GetComponent<Renderer>().material = m1; break;
+            case 'o': GetComponentInChildren<Renderer>().material = m2; break;
+            default : GetComponentInChildren<Renderer>().material = m1; break;
         }
     }
     
