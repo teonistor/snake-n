@@ -58,7 +58,7 @@ public class AnimationOverlord : MonoBehaviour {
             animation.clip = GetAppropriateClip();
             currentX = nextX;
             currentZ = nextZ;
-            
+            movementCode = ((movementCode % 10 + 1) % 4 + 1) * 10;
         } else {
             transform.parent = ahead.transform.parent;
             animation.clip = ahead.animation.clip;
@@ -81,7 +81,22 @@ public class AnimationOverlord : MonoBehaviour {
     }
 
     private AnimationClip GetAppropriateClip() {
-        return clips[0];
+        print("Movement code " + movementCode);
+        switch(movementCode) {
+            case 21: return clips[0];
+            case 23: return clips[1];
+            case 24: return clips[2];
+            case 12: return clips[3];
+            case 13: return clips[4];
+            case 14: return clips[5];
+            case 32: return clips[6];
+            case 31: return clips[7];
+            case 34: return clips[8];
+            case 42: return clips[9];
+            case 41: return clips[10];
+            case 43: return clips[11];
+            default: Debug.LogWarning("Unexpected movementCode: " + movementCode); return clips[0];
+        }
     }
 
     public void CouldMakeAnother () {
