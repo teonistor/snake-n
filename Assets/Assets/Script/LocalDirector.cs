@@ -6,11 +6,11 @@ public class LocalDirector : MonoBehaviour {
 
     [SerializeField] private GameObject levelSectionTile;
 
-    [SerializeField] private int viewRadius = 6;
+    [SerializeField] private int viewRadius = 6; // 9 would do for a start
 
     private TextAsset[] levelDefs;
     private string[] currentLevelDef;
-    private LevelSection[,] currentLevel;
+    private Level currentLevel;
 
     public static LocalDirector Instance { get; private set; }
 
@@ -23,7 +23,7 @@ public class LocalDirector : MonoBehaviour {
         print("Found " + levelDefs.Length + " level definitons");
 
         currentLevelDef = levelDefs[0].text.Split('\n');
-        currentLevel = new LevelSection[currentLevelDef.Length, currentLevelDef[0].Length];
+        currentLevel = new Level(currentLevelDef.Length, currentLevelDef[0].Length);
         print("Initialising level " + 1 + " of size " + currentLevelDef.Length + " x " + currentLevelDef[0].Length);
 
         //Debug.Break();
