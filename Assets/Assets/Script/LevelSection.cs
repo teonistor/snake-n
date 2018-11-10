@@ -6,6 +6,7 @@ public class LevelSection : MonoBehaviour {
 
     [SerializeField] private Material m1, m2, m3;
 
+    private int snakePartsCurrentlyAbove = 0;
     private int i, j;
 
     void Awake () {
@@ -29,4 +30,15 @@ public class LevelSection : MonoBehaviour {
 	void Update () {
 		
 	}
+
+    internal void Enter(bool isHead=false) {
+        if (isHead) {
+            // TODO Perform checks for powerups, death etc;
+        }
+        snakePartsCurrentlyAbove++;
+    }
+
+    internal void Leave() {
+        snakePartsCurrentlyAbove--;
+    }
 }

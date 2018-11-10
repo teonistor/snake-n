@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class LocalDirector : MonoBehaviour {
@@ -9,7 +8,7 @@ public class LocalDirector : MonoBehaviour {
     [SerializeField] private int viewRadius = 6; // 9 would do for a start
 
     private TextAsset[] levelDefs;
-    private string[] currentLevelDef;
+    //private string[] currentLevelDef;
     private Level currentLevel;
 
     public static LocalDirector Instance { get; private set; }
@@ -22,22 +21,21 @@ public class LocalDirector : MonoBehaviour {
         levelDefs = Resources.LoadAll<TextAsset>("LevelDefs/");
         print("Found " + levelDefs.Length + " level definitons");
 
-        currentLevelDef = levelDefs[0].text.Split('\n');
-        currentLevel = new Level(currentLevelDef.Length, currentLevelDef[0].Length);
-        print("Initialising level " + 1 + " of size " + currentLevelDef.Length + " x " + currentLevelDef[0].Length);
+        //currentLevelDef = levelDefs[0].text.Split('\n');
+        currentLevel = new Level(levelDefs[0].text, () => Instantiate(levelSectionTile, transform).GetComponent<LevelSection>());
 
         //Debug.Break();
     }
 
-    public Transform SnakeHeadEnters (int x, int z) {
+    public LevelSection SnakeHeadEnters (int x, int z) {
         MoveView(x, z);
         return SnakeBodyEnters(x, z);
     }
-    
-    public Transform SnakeBodyEnters (int x, int z) {
+
+    public LevelSection SnakeBodyEnters (int x, int z) {
         int i, j;
         WorldToLevelCoords(x, z, out i, out j);
-        return currentLevel[i, j].transform; // Rightfully assuming the head has already been wherever a body part is entering, we need not explicitly ensure the level section exists at that location
+        return currentLevel[i, j]; // Rightfully assuming the head has already been wherever a body part is entering, we need not explicitly ensure the level section exists at that location
     }
 
     private void WorldToLevelCoords (int x, int z, out int i, out int j) {
@@ -53,17 +51,9 @@ public class LocalDirector : MonoBehaviour {
         for (int z = viewCentreZ - viewRadius; z <= viewCentreZ + viewRadius; z++)
             for (int x = viewCentreX - viewRadius; x <= viewCentreX + viewRadius; x++) {
                 WorldToLevelCoords(x, z, out i, out j);
-                GetLevelSection(i, j).transform.position = new Vector3(x, 0, z);
+                currentLevel[i, j].transform.position = new Vector3(x, 0, z);
             }
 
-    }
-
-    private LevelSection GetLevelSection (int i, int j) {
-        if (currentLevel[i, j] == null) {
-            currentLevel[i, j] = Instantiate(levelSectionTile, transform).GetComponent<LevelSection>();
-            currentLevel[i, j].Init(i, j, currentLevelDef[i][j]);
-        }
-        return currentLevel[i, j];
     }
 
     private void CheckVieweingRadiusPreconditions () {

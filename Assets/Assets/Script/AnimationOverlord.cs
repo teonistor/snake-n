@@ -10,6 +10,8 @@ public class AnimationOverlord : MonoBehaviour {
 
     [SerializeField] internal GameObject another;
 
+    LevelSection currentSection;
+
     // TODO hack
     static int howMany = 30;
     bool couldMakeAnother = true;
@@ -27,9 +29,15 @@ public class AnimationOverlord : MonoBehaviour {
 	
 	void Update () {}
 
-    internal void Instruct(Transform parent, AnimationClip clip) {
+    internal void Instruct(LevelSection section, AnimationClip clip) {
         Animation.Stop();
-        transform.parent = parent;
+        if (currentSection != null)
+            currentSection.Leave();
+
+        currentSection = section;
+        transform.parent = section.transform;
+
+        currentSection.Enter();
         Animation.clip = clip;
         Animation.Play();
     }
@@ -45,7 +53,7 @@ public class AnimationOverlord : MonoBehaviour {
         }
 
         if (tail != null) {
-            tail.Instruct(transform.parent, Animation.clip);
+            tail.Instruct(currentSection, Animation.clip);
         }
     }
 }
