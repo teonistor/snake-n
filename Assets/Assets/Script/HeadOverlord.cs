@@ -57,7 +57,7 @@ public class HeadOverlord : AnimationOverlord {
         currentZ = nextZ;
         GenerateMovementCodeAndNextXZ();
 
-        LevelSection section = LocalDirector.Instance.SnakeHeadEnters(currentX, currentZ);
+        LevelSection section = World.Instance.SnakeHeadEnters(currentX, currentZ);
         section.Enter(true);
         Instruct(section, GetAppropriateClip());
 

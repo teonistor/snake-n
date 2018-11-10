@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public class LocalDirector : MonoBehaviour {
+public class World : MonoBehaviour {
 
     [SerializeField] private GameObject levelSectionTile;
 
@@ -11,7 +11,7 @@ public class LocalDirector : MonoBehaviour {
     //private string[] currentLevelDef;
     private Level currentLevel;
 
-    public static LocalDirector Instance { get; private set; }
+    public static World Instance { get; private set; }
 
     void Awake () {
         Instance = this;
