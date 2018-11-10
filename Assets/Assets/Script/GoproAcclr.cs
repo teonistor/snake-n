@@ -5,7 +5,7 @@ using UnityEngine;
 [RequireComponent(typeof(MeshRenderer))]
 public class GoproAcclr : MonoBehaviour {
 
-    public static float speed = 5f;
+    public static float speed = 0f;
     static readonly Vector3 limits = new Vector3(10f, 80f, 0f);
 
     private Vector3 initialLea, maxLea, minLea;

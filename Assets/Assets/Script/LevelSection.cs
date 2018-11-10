@@ -4,23 +4,31 @@ using UnityEngine;
 
 public class LevelSection : MonoBehaviour {
 
+    [SerializeField] private float energyRegeneration;
     [SerializeField] private Material m1, m2, m3;
     [SerializeField] private Renderer tile;
+    [SerializeField] private GameObject penetrableWall, impenetrableWall, oneEnergy;
 
     private int snakePartsCurrentlyAbove = 0;
     private int i, j;
+    private char type;
+
+    private GameObject item;
 
     void Awake () {
 
     }
 
-    public void Init(int i, int j, char d) {
+    public void Init(int i, int j, char type) {
         this.i = i;
         this.j = j;
+        this.type = type;
 
-        switch(d) {
-            case 'o': tile.material = m2; break;
-            default : tile.material = m1; break;
+        switch(type) {
+            case 'X': item = Instantiate(impenetrableWall, transform, false); break;
+            case 'x': item = Instantiate(penetrableWall, transform, false); break;
+            case 'o': item = Instantiate(oneEnergy, transform, false); break;
+                //default : tile.material = m1; break;
         }
     }
     
@@ -34,8 +42,25 @@ public class LevelSection : MonoBehaviour {
 
     internal void Enter (bool isHead = false) {
         if (isHead) {
+            if (type=='X' || snakePartsCurrentlyAbove>0) {
+                Debug.LogWarning("Dead!"); // TODO
+                return;
+            }
+            if (type == 'x') {
+                if (item) {
+                    Destroy(item);
+                    Debug.LogWarning("Lose energy"); // TODO
+                }
+            }
             StartCoroutine(Glow());
-            // TODO Perform checks for powerups, death etc;
+
+            if (type == 'o') {
+                if (item) {
+                    Destroy(item);
+                    Debug.LogWarning("Gain energy"); // TODO
+                    StartCoroutine(RegenerateEnergy(energyRegeneration));
+                }
+            }
         } else {
             snakePartsCurrentlyAbove++;
         }
@@ -46,7 +71,6 @@ public class LevelSection : MonoBehaviour {
     }
 
     private IEnumerator Glow() {
-        print("Spark started");
         Material m = tile.material;
         Color end = m.color;
         Color start = Color.Lerp(end, Color.white, 0.8f);
@@ -56,5 +80,10 @@ public class LevelSection : MonoBehaviour {
             yield return wait;
         }
         m.color = end;
+    }
+
+    private IEnumerator RegenerateEnergy(float waitTime) {
+        yield return new WaitForSeconds(waitTime);
+        item = Instantiate(oneEnergy, transform, false);
     }
 }

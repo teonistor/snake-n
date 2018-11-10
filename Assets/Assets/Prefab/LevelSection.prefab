@@ -138,7 +138,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e47cef73e9b7eb4c890f25966c4ffba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  energyRegeneration: 5
   m1: {fileID: 2100000, guid: 7c3573f3a0a3b2642925cf2880525c68, type: 2}
   m2: {fileID: 2100000, guid: 4012d98d85dbb6641b8024ed2979b19e, type: 2}
   m3: {fileID: 2100000, guid: 3b38f4d16efbb2849a6e96c96f72f58b, type: 2}
   tile: {fileID: 23449330328416756}
+  penetrableWall: {fileID: 1215076826989024, guid: 5ced876e48056bf47ae9019139417ae7,
+    type: 2}
+  impenetrableWall: {fileID: 1215076826989024, guid: f1ec998c2b39255418cbe396e2d400eb,
+    type: 2}
+  oneEnergy: {fileID: 1964297355764058, guid: 76af9e8a3753c8a4096d594c733e1e4f, type: 2}
