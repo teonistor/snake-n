@@ -4,17 +4,14 @@ using UnityEngine;
 
 [RequireComponent(typeof(Animation))]
 public class AnimationOverlord : MonoBehaviour {
-
-    //[SerializeField] private LocalDirector world;
+    
     [SerializeField] internal AnimationClip[] clips;
 
     [SerializeField] internal GameObject another;
 
     LevelSection currentSection;
 
-    // TODO hack
-    static int howMany = 30;
-    bool couldMakeAnother = true;
+    protected int indexInSnake;
     AnimationOverlord tail = null;
 
     public Animation Animation { get; internal set; }
@@ -22,12 +19,17 @@ public class AnimationOverlord : MonoBehaviour {
     void Awake() {
         Animation = GetComponent<Animation>();
     }
-    
+
     void Start () {
         NextTile ();
 	}
 	
-	void Update () {}
+	void Update () {
+        if (indexInSnake >= World.currentEnergy && tail != null && tail.tail == null) {
+            Destroy(tail.gameObject);
+            tail = null;
+        }
+    }
 
     internal void Instruct(LevelSection section, AnimationClip clip) {
         Animation.Stop();
@@ -46,10 +48,9 @@ public class AnimationOverlord : MonoBehaviour {
 
 
     public virtual void QuarterTile () { // TODO rename this
-        if (tail == null && couldMakeAnother && howMany > 0) {
-            couldMakeAnother = false; // Redundant?
-            howMany--;
+        if (indexInSnake < World.currentEnergy && tail == null) {
             tail = Instantiate(another, transform.parent).GetComponent<AnimationOverlord>();
+            tail.indexInSnake = indexInSnake + 1;
         }
 
         if (tail != null) {

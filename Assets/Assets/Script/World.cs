@@ -4,8 +4,9 @@ using UnityEngine;
 public class World : MonoBehaviour {
     const int OneEnergyPoints = 10;
     const int FullEnergyPoints = 50;
-    const int OneEnergyParts = 7;
-    const int PenetrableWallParts = -15;
+    const int OneEnergyEnergy = 7;
+    const int MaximumEnergy = 66;
+    const int PenetrableWallEnergy = -15;
 
     [SerializeField] private GameObject levelSectionTile;
     [SerializeField] private int viewRadius; // 9 would do for a start
@@ -23,6 +24,8 @@ public class World : MonoBehaviour {
 
     public static int CurrentPoints { get; private set; }
 
+    internal static float currentEnergy = 25;
+    internal static float targetEnergy = 25;
     internal static int currentLevelIndex = 0;
     private static World Instance;
 
@@ -43,6 +46,18 @@ public class World : MonoBehaviour {
         //Debug.Break();
     }
 
+    void Update() {
+        //print("Current energy: " + currentEnergy);
+        if (currentEnergy != targetEnergy) {
+            currentEnergy = Mathf.MoveTowards(currentEnergy, targetEnergy, Time.deltaTime * 10);
+        }
+
+        if (currentEnergy <= 0) {
+            print("Dead");
+            SceneManager.LoadSceneAsync("Menu"); // TODO UI
+        }
+    }
+
     public static LevelSection InstantiateLevelSection() {
         return Instantiate(Instance.levelSectionTile, Instance.transform).GetComponent<LevelSection>();
     }
@@ -60,20 +75,21 @@ public class World : MonoBehaviour {
 
     public static void CollectOneEnergy () {
         CurrentPoints += OneEnergyPoints;
-        // TODO parts
+        currentEnergy = targetEnergy =
+            Mathf.Min(targetEnergy + OneEnergyEnergy, MaximumEnergy);
     }
 
     public static void CollectAllEnergy() {
         CurrentPoints += FullEnergyPoints;
-        // TODO parts
+        currentEnergy = targetEnergy = MaximumEnergy;
     }
 
     public static void HitPenetrableWall() {
-        // TODO parts
+        targetEnergy += PenetrableWallEnergy;
     }
 
     public static void Die() {
-        /// TODO
+        targetEnergy = 0;
     }
 
     private static void WorldToLevelCoords (int x, int z, out int i, out int j) {

@@ -46,6 +46,7 @@ public class HeadOverlord : AnimationOverlord {
     private int movementCode;
 
     void Start () {
+        indexInSnake = 0;
         //Animation = GetComponent<Animation>();
         movementCode = 30; // Arbitrary?
         nextZ = 1; // As above
