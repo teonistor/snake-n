@@ -1,5 +1,6 @@
 ﻿using UnityEngine.SceneManagement;
 using UnityEngine;
+using System.Collections;
 
 public class World : MonoBehaviour {
     const int OneEnergyPoints = 10;
@@ -24,12 +25,17 @@ public class World : MonoBehaviour {
 
     public static int CurrentPoints { get; private set; }
 
+    public static GameState GameState { get; private set; }
+
     internal static float currentEnergy = 25;
     internal static float targetEnergy = 25;
     internal static int currentLevelIndex = 0;
     private static World Instance;
 
     void Awake () {
+        // TODO Initial movements
+        // GameState = GameState.Prologue;
+        GameState = GameState.Playing;
         Instance = this;
         SceneManager.LoadSceneAsync("InGameUI", LoadSceneMode.Additive);
     }
@@ -41,6 +47,10 @@ public class World : MonoBehaviour {
         print("Found " + levelDefs.Length + " level definitons");
 
         //currentLevelDef = levelDefs[0].text.Split('\n');
+        if (currentLevelIndex >= levelDefs.Length) {
+            Debug.LogWarning("Level index " + currentLevelIndex + " larger than highest available level. Restarting from 0.");
+            currentLevelIndex = 0;
+        }
         currentLevel = new Level(levelDefs[currentLevelIndex].text);
 
         //Debug.Break();
@@ -52,9 +62,12 @@ public class World : MonoBehaviour {
             currentEnergy = Mathf.MoveTowards(currentEnergy, targetEnergy, Time.deltaTime * 10);
         }
 
+        if (CurrentPoints > CurrentLevelRequiredPoints) {
+            StartCoroutine(NextLevel());
+        }
+
         if (currentEnergy <= 0) {
-            print("Dead");
-            SceneManager.LoadSceneAsync("Menu"); // TODO UI
+            StartCoroutine(GameOver());
         }
     }
 
@@ -90,6 +103,19 @@ public class World : MonoBehaviour {
 
     public static void Die() {
         targetEnergy = 0;
+    }
+
+    IEnumerator NextLevel () {
+        GameState = GameState.LevelComplete;
+        yield return new WaitForSeconds(9f);
+        currentLevelIndex++;
+        SceneManager.LoadSceneAsync("One");
+    }
+
+    IEnumerator GameOver () {
+        GameState = GameState.GameOver;
+        yield return new WaitForSeconds(9f);
+        SceneManager.LoadSceneAsync("Menu");
     }
 
     private static void WorldToLevelCoords (int x, int z, out int i, out int j) {

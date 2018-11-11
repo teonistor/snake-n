@@ -35,7 +35,13 @@ public class InGameUI : MonoBehaviour {
         progress.rectTransform.sizeDelta = Vector2.MoveTowards(progress.rectTransform.sizeDelta, progressSize, Time.deltaTime * 100f);
 
         if (World.CurrentPoints > World.CurrentLevelRequiredPoints) {
-            StartCoroutine(EndLevel());
+            
+        }
+
+        switch(World.GameState) {
+            //case 
+            case GameState.LevelComplete: bigBanner.text = "Level complete"; break;
+            case GameState.GameOver: bigBanner.text = "You died"; break;
         }
     }
 
@@ -43,11 +49,5 @@ public class InGameUI : MonoBehaviour {
         yield return new WaitForSeconds(8f);
         smallBanner.text = "";
         bigBanner.text = "";
-    }
-
-    IEnumerator EndLevel() {
-        bigBanner.text = "Level complete";
-        yield return new WaitForSeconds(9f);
-        SceneManager.LoadSceneAsync("Menu"); // TODO move this logic to World and make more logical
     }
 }
