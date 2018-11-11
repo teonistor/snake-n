@@ -26,6 +26,7 @@ public class AnimationOverlord : MonoBehaviour {
 	
 	void Update () {
         if (indexInSnake >= World.currentEnergy && tail != null && tail.tail == null) {
+            tail.currentSection.Leave();
             Destroy(tail.gameObject);
             tail = null;
         }

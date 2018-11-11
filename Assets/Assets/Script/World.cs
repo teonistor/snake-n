@@ -3,6 +3,8 @@ using UnityEngine;
 using System.Collections;
 
 public class World : MonoBehaviour {
+    const float BaseTimeScale = 4f;
+
     const int OneEnergyPoints = 10;
     const int FullEnergyPoints = 50;
     const int OneEnergyEnergy = 7;
@@ -57,7 +59,17 @@ public class World : MonoBehaviour {
     }
 
     void Update() {
-        //print("Current energy: " + currentEnergy);
+        if (Input.GetButtonDown("Cancel")) {
+            if (GameState == GameState.Playing) {
+                GameState = GameState.Paused;
+                Time.timeScale = 0f;
+            } else if (GameState == GameState.Paused) {
+                GameState = GameState.Playing;
+                Time.timeScale = BaseTimeScale;
+            }
+        }
+
+
         if (currentEnergy != targetEnergy) {
             currentEnergy = Mathf.MoveTowards(currentEnergy, targetEnergy, Time.deltaTime * 10);
         }

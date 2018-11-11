@@ -18,15 +18,15 @@ public class GoproAcclr : MonoBehaviour {
         minLea = initialLea - limits;
         useAcceleration = Input.acceleration != Vector3.zero;
         if (!useAcceleration) {
-            Cursor.lockState = CursorLockMode.Confined;
-            Cursor.visible = false;
+            //Cursor.lockState = CursorLockMode.Confined;
+            //Cursor.visible = false;
         }
     }
 
     void OnDisable () {
         if (!useAcceleration) {
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
+            //Cursor.lockState = CursorLockMode.None;
+            //Cursor.visible = true;
         }
     }
 

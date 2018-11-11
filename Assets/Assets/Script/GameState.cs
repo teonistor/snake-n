@@ -5,6 +5,7 @@ using UnityEngine;
 public enum GameState {
 	 Prologue,
      Playing,
+     Paused,
      LevelComplete,
      GameOver
 }

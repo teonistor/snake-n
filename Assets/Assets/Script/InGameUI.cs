@@ -7,6 +7,7 @@ public class InGameUI : MonoBehaviour {
 
     [SerializeField] Text score, timer, multiplier, smallBanner, bigBanner;
     [SerializeField] Image progress;
+    [SerializeField] GameObject pauseUI;
 
     private string scoreTemplate, timerTemplate, multiplierTemplate, smallBannerTemplate;
     private Vector2 initialProgressSize;
@@ -40,6 +41,8 @@ public class InGameUI : MonoBehaviour {
 
         switch(World.GameState) {
             //case 
+            //case GameState.Playing: bigBanner.text = smallBanner.text = ""; pauseUI.SetActive(false); break;
+            case GameState.Paused: bigBanner.text = "Game paused."; pauseUI.SetActive(true); break;
             case GameState.LevelComplete: bigBanner.text = "Level complete"; break;
             case GameState.GameOver: bigBanner.text = "You died"; break;
         }
@@ -49,5 +52,9 @@ public class InGameUI : MonoBehaviour {
         yield return new WaitForSeconds(8f);
         smallBanner.text = "";
         bigBanner.text = "";
+    }
+
+    public void QuitToMenu() {
+        SceneManager.LoadSceneAsync("Menu");
     }
 }

@@ -4,20 +4,30 @@ using UnityEngine.SceneManagement;
 
 public class MainMenu : MonoBehaviour {
 
-    [SerializeField] private InputField inputField;
-    [SerializeField] private Text isGyro;
+    [SerializeField] GameObject resume, normalBottom, devToolBottom;
 
-    public void ChangeQuality () {
-        int i = int.Parse(inputField.text);
-        QualitySettings.SetQualityLevel(i, true);
+    void Start () {
+        if (World.currentLevelIndex > 0) { // TODO better condition
+            resume.SetActive(true);
+        }
     }
+        //public void ChangeQuality () {
+        //    int i = int.Parse(inputField.text);
+        //    QualitySettings.SetQualityLevel(i, true);
+        //}
 
-    public void ChangeAcceleroSpeed() {
-        float f = float.Parse(inputField.text);
-        GoproAcclr.speed = f;
+        //public void ChangeAcceleroSpeed() {
+        //    float f = float.Parse(inputField.text);
+        //    GoproAcclr.speed = f;
+        //}
+
+     public void ContinueGame () {
+        SceneManager.LoadSceneAsync(1);
     }
 
     public void StartGame() {
+        World.currentLevelIndex = 0;
+        World.currentEnergy = World.targetEnergy = 25;
         SceneManager.LoadSceneAsync(1);
     }
 
@@ -25,13 +35,15 @@ public class MainMenu : MonoBehaviour {
         Application.Quit();
     }
 
-	// Use this for initialization
-	void Start () {
-        isGyro.text = "Gyro is" + (Input.isGyroAvailable ? " " : " not ") + "available.";
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    public void ActivateDevTool () {
+        normalBottom.SetActive(false);
+        devToolBottom.SetActive(true);
+    }
+
+    public void SubmitDevTool () {
+        // devToolBottom.GetComponentInChildren<InputField>().text; //...
+        devToolBottom.GetComponentInChildren<InputField>().text = "";
+        devToolBottom.SetActive(false);
+        normalBottom.SetActive(true);
+    }
 }
