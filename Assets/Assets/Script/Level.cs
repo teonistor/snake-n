@@ -5,23 +5,23 @@ using UnityEngine;
 
 public class Level {
 
-    private Func<LevelSection> InstantiateLevelSection;
-    private string name;
-    private float timeout;
+    internal string Name { get; private set; }
+    internal float Timeout { get; private set; }
+    internal int RequiredPoints { get; private set; }
+
     private IList<string> levelDef;
     private LevelSection[,] level;
 
-    public Level (string definition, Func<LevelSection> InstantiateLevelSection) {
-        this.InstantiateLevelSection = InstantiateLevelSection;
-
+    public Level (string definition) {
         definition.Replace("\r", ""); // Protect ourselves from Windows-style line endings
 
         string[] defRows = definition.Split('\n');
-        name = defRows[0];
-        timeout = float.Parse(defRows[1]);
+        Name = defRows[0];
+        Timeout = float.Parse(defRows[1]);
+        RequiredPoints = int.Parse(defRows[2]);
 
         // TODO order definitions? Other?
-        int i = 2;
+        int i = 3;
         while (defRows[i].Length > 0) i++;
         while (defRows[i].Length == 0) i++; // Reach beginning of defs
 
@@ -31,7 +31,7 @@ public class Level {
         }
 
         level = new LevelSection[levelDef.Count, levelDef[0].Length];
-        Debug.Log("Initialising level " + name + " of size " + levelDef.Count + " x " + levelDef[0].Length);
+        Debug.Log("Initialising level " + Name + " of size " + levelDef.Count + " x " + levelDef[0].Length);
 
         // TODO sequence actions
         // ...
@@ -40,7 +40,7 @@ public class Level {
     public LevelSection this[int i, int j] {
         get {
             if (level[i, j] == null) {
-                level[i, j] = InstantiateLevelSection();
+                level[i, j] = World.InstantiateLevelSection();
                 level[i, j].Init(i, j, levelDef[i][j]);
             }
             return level[i, j];

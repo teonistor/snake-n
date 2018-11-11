@@ -45,7 +45,7 @@ public class AnimationOverlord : MonoBehaviour {
     internal virtual void NextTile () {}
 
 
-    public void QuarterTile () { // TODO rename this
+    public virtual void QuarterTile () { // TODO rename this
         if (tail == null && couldMakeAnother && howMany > 0) {
             couldMakeAnother = false; // Redundant?
             howMany--;

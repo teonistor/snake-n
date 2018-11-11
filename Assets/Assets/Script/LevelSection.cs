@@ -43,13 +43,13 @@ public class LevelSection : MonoBehaviour {
     internal void Enter (bool isHead = false) {
         if (isHead) {
             if (type=='X' || snakePartsCurrentlyAbove>0) {
-                Debug.LogWarning("Dead!"); // TODO
+                World.Die();
                 return;
             }
             if (type == 'x') {
                 if (item) {
                     Destroy(item);
-                    Debug.LogWarning("Lose energy"); // TODO
+                    World.HitPenetrableWall();
                 }
             }
             StartCoroutine(Glow());
@@ -57,7 +57,7 @@ public class LevelSection : MonoBehaviour {
             if (type == 'o') {
                 if (item) {
                     Destroy(item);
-                    Debug.LogWarning("Gain energy"); // TODO
+                    World.CollectOneEnergy();
                     StartCoroutine(RegenerateEnergy(energyRegeneration));
                 }
             }

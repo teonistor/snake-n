@@ -57,7 +57,7 @@ public class HeadOverlord : AnimationOverlord {
         currentZ = nextZ;
         GenerateMovementCodeAndNextXZ();
 
-        LevelSection section = World.Instance.SnakeHeadEnters(currentX, currentZ);
+        LevelSection section = World.SnakeHeadEnters(currentX, currentZ);
         section.Enter(true);
         Instruct(section, GetAppropriateClip());
 
@@ -101,6 +101,9 @@ public class HeadOverlord : AnimationOverlord {
         }
     }
 
+    //public override void QuarterTile () {
+    //    base.QuarterTile();
+    //}
 
     //IEnumerator<int> sthEnum = sth();
     //private static IEnumerator<int> sth () {
