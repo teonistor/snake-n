@@ -43,9 +43,9 @@ public class World : MonoBehaviour {
     private static World Instance;
 
     void Awake () {
-        // TODO Initial movements
-        // GameState = GameState.Prologue;
+        Time.timeScale = BaseTimeScale;
         GameState = GameState.Prologue;
+
         Instance = this;
         SceneManager.LoadSceneAsync("InGameUI", LoadSceneMode.Additive);
     }
@@ -141,13 +141,13 @@ public class World : MonoBehaviour {
         GameState = GameState.LevelComplete;
         yield return new WaitForSeconds(9f);
         currentLevelIndex++;
-        SceneManager.LoadSceneAsync("One");
+        SceneManager.LoadScene("One");
     }
 
     IEnumerator GameOver () {
         GameState = GameState.GameOver;
         yield return new WaitForSeconds(9f);
-        SceneManager.LoadSceneAsync("Menu");
+        SceneManager.LoadScene("Menu");
     }
 
     private static void WorldToLevelCoords (int x, int z, out int i, out int j) {
