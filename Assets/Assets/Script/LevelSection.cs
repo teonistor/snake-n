@@ -43,7 +43,7 @@ public class LevelSection : MonoBehaviour {
     internal void Enter (bool isHead = false) {
         if (isHead) {
             if (type=='X' || snakePartsCurrentlyAbove>0) {
-                World.Die();
+                World.HitSelfOrImpenetrableWall();
                 return;
             }
             if (type == 'x') {

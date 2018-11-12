@@ -105,22 +105,28 @@ public class World : MonoBehaviour {
     }
 
     public static void CollectOneEnergy () {
-        CurrentPoints += OneEnergyPoints;
-        currentEnergy = targetEnergy =
-            Mathf.Min(targetEnergy + OneEnergyEnergy, MaximumEnergy);
+        if (GameState == GameState.Playing) {
+            CurrentPoints += OneEnergyPoints;
+            currentEnergy = targetEnergy =
+                Mathf.Min(targetEnergy + OneEnergyEnergy, MaximumEnergy);
+        }
     }
 
-    public static void CollectAllEnergy() {
-        CurrentPoints += FullEnergyPoints;
-        currentEnergy = targetEnergy = MaximumEnergy;
+    public static void CollectAllEnergy () {
+        if (GameState == GameState.Playing) {
+            CurrentPoints += FullEnergyPoints;
+            currentEnergy = targetEnergy = MaximumEnergy;
+        }
     }
 
     public static void HitPenetrableWall() {
-        targetEnergy += PenetrableWallEnergy;
+        if (GameState == GameState.Playing)
+            targetEnergy += PenetrableWallEnergy;
     }
 
-    public static void Die() {
-        targetEnergy = 0;
+    public static void HitSelfOrImpenetrableWall() {
+        if (GameState == GameState.Playing)
+            targetEnergy = 0;
     }
 
     public static void OpeningMovesFinished () {

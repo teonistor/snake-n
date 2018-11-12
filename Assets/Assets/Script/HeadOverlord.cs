@@ -103,7 +103,7 @@ public class HeadOverlord : AnimationOverlord {
         if (World.GameState == GameState.Playing) {
             anyTurn = LeftTurn + RightTurn;
         }
-        if (World.GameState == GameState.GameOver) {
+        if (World.GameState == GameState.GameOver || World.GameState == GameState.LevelComplete) {
             anyTurn = Random.Range(-1, 2);
         }
 
