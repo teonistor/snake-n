@@ -146,6 +146,7 @@ public class World : MonoBehaviour {
 
     IEnumerator GameOver () {
         GameState = GameState.GameOver;
+        currentLevelIndex = 0;
         yield return new WaitForSeconds(9f);
         SceneManager.LoadScene("Menu");
     }
