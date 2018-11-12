@@ -36,7 +36,7 @@ public class HeadOverlord : AnimationOverlord {
 
 
     /******
-     * Tens digit represents were we're entering
+     * Tens digit represents were we're entering from
      * Units digit represents were we're headed
      * 1 = North
      * 2 = East
@@ -58,7 +58,7 @@ public class HeadOverlord : AnimationOverlord {
         currentZ = nextZ;
         GenerateMovementCodeAndNextXZ();
 
-        LevelSection section = World.SnakeHeadEnters(currentX, currentZ);
+        LevelSection section = World.SnakeHeadEnters(currentX, currentZ, movementCode);
         section.Enter(true);
         Instruct(section, GetAppropriateClip());
 

@@ -10,6 +10,7 @@ public class World : MonoBehaviour {
     const int OneEnergyEnergy = 7;
     const int MaximumEnergy = 66;
     const int PenetrableWallEnergy = -15;
+    const int viewCentreShift = 4;
 
     [SerializeField] private GameObject levelSectionTile;
     [SerializeField] private int viewRadius; // 9 would do for a start
@@ -87,8 +88,8 @@ public class World : MonoBehaviour {
         return Instantiate(Instance.levelSectionTile, Instance.transform).GetComponent<LevelSection>();
     }
 
-    public static LevelSection SnakeHeadEnters (int x, int z) {
-        MoveView(x, z);
+    public static LevelSection SnakeHeadEnters (int x, int z, int movementCode) {
+        MoveView(x, z, movementCode);
         return SnakeBodyEnters(x, z);
     }
 
@@ -137,7 +138,26 @@ public class World : MonoBehaviour {
         if (j < 0) j += currentLevel.GetLength(1);
     }
 
-    private static void MoveView (int viewCentreX, int viewCentreZ) {
+    private static void MoveView (int viewCentreX, int viewCentreZ, int movementCode) {
+
+        // Adjust centre for orientation based on current movement
+        switch (movementCode) {
+            case 34:
+            case 21: viewCentreZ += viewCentreShift; viewCentreX -= viewCentreShift; break;
+            case 14:
+            case 23: viewCentreZ -= viewCentreShift; viewCentreX -= viewCentreShift; break;
+            case 24: viewCentreX -= viewCentreShift; break;
+            case 43:
+            case 12: viewCentreZ -= viewCentreShift; viewCentreX += viewCentreShift; break;
+            case 13: viewCentreZ -= viewCentreShift; break;
+            case 41:
+            case 32: viewCentreZ += viewCentreShift; viewCentreX += viewCentreShift; break;
+            case 31: viewCentreZ += viewCentreShift; break;
+            case 42: viewCentreX += viewCentreShift; break;
+            default: Debug.LogWarning("Unexpected movementCode in World.AdjustViewCentreForMovement: " + movementCode); break;
+        }
+
+        // Iterate over relevant region and put tiles where they belong
         int i, j;
         CheckVieweingRadiusPreconditions();
         for (int z = viewCentreZ - Instance.viewRadius; z <= viewCentreZ + Instance.viewRadius; z++)
