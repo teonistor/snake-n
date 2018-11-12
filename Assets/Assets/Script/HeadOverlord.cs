@@ -10,6 +10,8 @@ public class HeadOverlord : AnimationOverlord {
     public int nextX { get; private set; }
     public int nextZ { get; private set; }
 
+    private IEnumerator<int> ongoingOpeningMoves = null;
+
     // Controls
     private int LeftTurn {
         get {
@@ -87,10 +89,25 @@ public class HeadOverlord : AnimationOverlord {
     }
 
     private void GenerateMovementCodeAndNextXZ () {
-        // TODO pre-/post-level action
-        //sthEnum.MoveNext();
-        //int exitVia = sthEnum.Current;// (Random.Range(1, 4) + movementCode / 10 - 1) % 4 + 1;
-        int exitVia = (movementCode / 10 + 1 + LeftTurn + RightTurn) % 4 + 1;
+        int anyTurn = 0;
+
+        if (World.GameState == GameState.Prologue) {
+            if (ongoingOpeningMoves == null)
+                ongoingOpeningMoves = OpeningMoves(World.CurrentLevelOpeningMoves);
+
+            if (ongoingOpeningMoves.MoveNext())
+                anyTurn = ongoingOpeningMoves.Current;
+            else
+                World.OpeningMovesFinished();
+        }
+        if (World.GameState == GameState.Playing) {
+            anyTurn = LeftTurn + RightTurn;
+        }
+        if (World.GameState == GameState.GameOver) {
+            anyTurn = Random.Range(-1, 2);
+        }
+
+        int exitVia = (movementCode / 10 + 1 + anyTurn) % 4 + 1;
 
         movementCode += exitVia;
         switch (exitVia) {
@@ -102,28 +119,8 @@ public class HeadOverlord : AnimationOverlord {
         }
     }
 
-    //public override void QuarterTile () {
-    //    base.QuarterTile();
-    //}
-
-    //IEnumerator<int> sthEnum = sth();
-    //private static IEnumerator<int> sth () {
-    //    yield return 1;
-    //    yield return 1;
-    //    yield return 1;
-    //    yield return 2;
-    //    yield return 2;
-    //    yield return 2;
-    //    yield return 2;
-    //    yield return 3;
-    //    yield return 3;
-    //    yield return 3;
-    //    yield return 2;
-    //    yield return 2;
-    //    yield return 2;
-    //    yield return 3;
-    //    yield return 3;
-    //    yield return 3;
-    //    while (true) yield return 4;
-    //}
+    private static IEnumerator<int> OpeningMoves (int[] openingMoves) {
+        foreach (int move in openingMoves)
+            yield return move;
+    }
 }

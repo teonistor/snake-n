@@ -25,7 +25,6 @@ public class InGameUI : MonoBehaviour {
 
         smallBanner.text = string.Format(smallBannerTemplate, World.currentLevelIndex + 1);
         bigBanner.text = World.CurrentLevelName;
-        StartCoroutine(HideBanners());
 	}
 
     void LateUpdate () {
@@ -35,25 +34,16 @@ public class InGameUI : MonoBehaviour {
         progressSize.x = progressSize.x * (World.CurrentLevelRequiredPoints - World.CurrentPoints) / World.CurrentLevelRequiredPoints;
         progress.rectTransform.sizeDelta = Vector2.MoveTowards(progress.rectTransform.sizeDelta, progressSize, Time.deltaTime * 100f);
 
-        if (World.CurrentPoints > World.CurrentLevelRequiredPoints) {
-            
-        }
-
         switch(World.GameState) {
             //case 
-            //case GameState.Playing: bigBanner.text = smallBanner.text = ""; pauseUI.SetActive(false); break;
+            case GameState.Playing: bigBanner.text = smallBanner.text = ""; pauseUI.SetActive(false); break;
             case GameState.Paused: bigBanner.text = "Game paused."; pauseUI.SetActive(true); break;
             case GameState.LevelComplete: bigBanner.text = "Level complete"; break;
             case GameState.GameOver: bigBanner.text = "You died"; break;
         }
     }
 
-    IEnumerator HideBanners() {
-        yield return new WaitForSeconds(8f);
-        smallBanner.text = "";
-        bigBanner.text = "";
-    }
-
+    // Button action
     public void QuitToMenu() {
         SceneManager.LoadSceneAsync("Menu");
     }

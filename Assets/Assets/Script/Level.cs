@@ -4,10 +4,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Level {
+    static readonly char[] OneEmpty = { ' ' };
 
     internal string Name { get; private set; }
     internal float Timeout { get; private set; }
     internal int RequiredPoints { get; private set; }
+    internal int[] OpeningMoves { get; private set; }
 
     private IList<string> levelDef;
     private LevelSection[,] level;
@@ -22,7 +24,7 @@ public class Level {
 
         // TODO order definitions? Other?
         int i = 3;
-        while (defRows[i].Length > 0) i++;
+        while (defRows[i].Length > 0) i++; // Forwards compatibility 
         while (defRows[i].Length == 0) i++; // Reach beginning of defs
 
         levelDef = new List<string>();
@@ -33,8 +35,12 @@ public class Level {
         level = new LevelSection[levelDef.Count, levelDef[0].Length];
         Debug.Log("Initialising level " + Name + " of size " + levelDef.Count + " x " + levelDef[0].Length);
 
-        // TODO sequence actions
-        // ...
+        while (defRows[i].Length == 0) i++; // Reach beginning of opening moves
+        string[] openingMovesStr = defRows[i].Split(OneEmpty, StringSplitOptions.RemoveEmptyEntries);
+        OpeningMoves = new int[openingMovesStr.Length];
+        for (int j = 0; j < OpeningMoves.Length; j++) {
+            OpeningMoves[j] = int.Parse(openingMovesStr[j]);
+        }
     }
 
     public LevelSection this[int i, int j] {

@@ -1,6 +1,7 @@
 ﻿using UnityEngine.SceneManagement;
 using UnityEngine;
 using System.Collections;
+using System;
 
 public class World : MonoBehaviour {
     const float BaseTimeScale = 4f;
@@ -26,6 +27,10 @@ public class World : MonoBehaviour {
         return currentLevel.RequiredPoints;
     }}
 
+    public static int[] CurrentLevelOpeningMoves { get {
+        return currentLevel.OpeningMoves;
+    }}
+
     public static int CurrentPoints { get; private set; }
 
     public static GameState GameState { get; private set; }
@@ -38,7 +43,7 @@ public class World : MonoBehaviour {
     void Awake () {
         // TODO Initial movements
         // GameState = GameState.Prologue;
-        GameState = GameState.Playing;
+        GameState = GameState.Prologue;
         Instance = this;
         SceneManager.LoadSceneAsync("InGameUI", LoadSceneMode.Additive);
     }
@@ -116,6 +121,10 @@ public class World : MonoBehaviour {
 
     public static void Die() {
         targetEnergy = 0;
+    }
+
+    public static void OpeningMovesFinished () {
+        GameState = GameState.Playing;
     }
 
     IEnumerator NextLevel () {
