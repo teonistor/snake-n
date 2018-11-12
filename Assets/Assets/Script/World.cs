@@ -4,7 +4,7 @@ using System.Collections;
 using System;
 
 public class World : MonoBehaviour {
-    const float BaseTimeScale = 4f;
+    internal const float BaseTimeScale = 4f;
 
     const int OneEnergyPoints = 10;
     const int FullEnergyPoints = 50;
@@ -35,6 +35,8 @@ public class World : MonoBehaviour {
 
     public static GameState GameState { get; private set; }
 
+    public static float CurrentLevelTimeLimit { get; private set; }
+
     internal static float currentEnergy = 25;
     internal static float targetEnergy = 25;
     internal static int currentLevelIndex = 0;
@@ -61,6 +63,8 @@ public class World : MonoBehaviour {
         }
         currentLevel = new Level(levelDefs[currentLevelIndex].text);
 
+        // TODO fix for speed variability
+        CurrentLevelTimeLimit = Time.time + currentLevel.Timeout * BaseTimeScale;
         //Debug.Break();
     }
 
@@ -84,7 +88,7 @@ public class World : MonoBehaviour {
             StartCoroutine(NextLevel());
         }
 
-        if (currentEnergy <= 0) {
+        if (currentEnergy <= 0 || Time.time > CurrentLevelTimeLimit) {
             StartCoroutine(GameOver());
         }
     }

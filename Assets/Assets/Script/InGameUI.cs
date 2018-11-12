@@ -29,6 +29,8 @@ public class InGameUI : MonoBehaviour {
 
     void LateUpdate () {
         score.text = string.Format(scoreTemplate, World.CurrentPoints);
+        int remainingTime = Mathf.Max(0, (int)((World.CurrentLevelTimeLimit - Time.time) / World.BaseTimeScale + 1));
+        timer.text = string.Format(timerTemplate, remainingTime / 60, remainingTime % 60);
 
         Vector2 progressSize = initialProgressSize;
         progressSize.x = progressSize.x * (World.CurrentLevelRequiredPoints - World.CurrentPoints) / World.CurrentLevelRequiredPoints;
