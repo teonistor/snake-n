@@ -25,8 +25,8 @@ public class MainMenu : MonoBehaviour {
         SceneManager.LoadSceneAsync(1);
     }
 
-    public void StartGame() {
-        World.currentLevelIndex = 0;
+    public void StartGame(int levelIndex = 0) {
+        World.currentLevelIndex = levelIndex;
         World.currentEnergy = World.targetEnergy = 25;
         SceneManager.LoadSceneAsync(1);
     }
@@ -41,7 +41,12 @@ public class MainMenu : MonoBehaviour {
     }
 
     public void SubmitDevTool () {
-        // devToolBottom.GetComponentInChildren<InputField>().text; //...
+        string[] cmd = devToolBottom.GetComponentInChildren<InputField>().text.ToLower().Split(Level.OneEmpty, System.StringSplitOptions.RemoveEmptyEntries);
+        switch (cmd[0]) {
+            case "startfrom": StartGame(int.Parse(cmd[1])); break;
+        }
+
+
         devToolBottom.GetComponentInChildren<InputField>().text = "";
         devToolBottom.SetActive(false);
         normalBottom.SetActive(true);

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Level {
-    static readonly char[] OneEmpty = { ' ' };
+    internal static readonly char[] OneEmpty = { ' ' };
 
     internal string Name { get; private set; }
     internal float Timeout { get; private set; }
