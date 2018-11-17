@@ -9,6 +9,9 @@ public class LevelSection : MonoBehaviour {
     [SerializeField] private Renderer tile;
     [SerializeField] private GameObject penetrableWall, impenetrableWall, oneEnergy;
 
+    internal delegate void Noarg ();
+    internal event Noarg OnHeadEnter;
+
     private int snakePartsCurrentlyAbove = 0;
     private int i, j;
     private char type;
@@ -16,7 +19,7 @@ public class LevelSection : MonoBehaviour {
     private GameObject item;
 
     void Awake () {
-
+        OnHeadEnter = () => { };
     }
 
     public void Init(int i, int j, char type) {
@@ -26,16 +29,17 @@ public class LevelSection : MonoBehaviour {
 
         switch(type) {
             case 'X': item = Instantiate(impenetrableWall, transform, false); break;
-            case 'x': item = Instantiate(penetrableWall, transform, false); break;
-            case 'o': item = Instantiate(oneEnergy, transform, false); break;
+            case 'x': item = Instantiate(penetrableWall, transform, false);
+                      OnHeadEnter += HitPenetrableWall; break;
+            //case 'o': item = Instantiate(oneEnergy, transform, false); break;
                 //default : tile.material = m1; break;
         }
     }
-    
+
 	void Start () {
 		
 	}
-	
+
 	void Update () {
 		
 	}
@@ -46,21 +50,19 @@ public class LevelSection : MonoBehaviour {
                 World.HitSelfOrImpenetrableWall();
                 return;
             }
-            if (type == 'x') {
-                if (item) {
-                    Destroy(item);
-                    World.HitPenetrableWall();
-                }
-            }
+
+            OnHeadEnter();
             StartCoroutine(Glow());
 
-            if (type == 'o') {
-                if (item) {
-                    Destroy(item);
-                    World.CollectOneEnergy();
-                    StartCoroutine(RegenerateEnergy(energyRegeneration));
-                }
-            }
+            //if (type == 'o') {
+            //    if (item) {
+            //        Destroy(item);
+            //        World.CollectOneEnergy();
+            //        StartCoroutine(RegenerateEnergy(energyRegeneration));
+            //    }
+            //}
+
+        // Since head extends part, Enter will be called twice by the head entering, once with the flag true and once false
         } else {
             snakePartsCurrentlyAbove++;
         }
@@ -68,6 +70,27 @@ public class LevelSection : MonoBehaviour {
 
     internal void Leave() {
         snakePartsCurrentlyAbove--;
+    }
+
+    internal void SpawnCollectible() { // Which collectible?
+        if (item == null) {
+            item = Instantiate(oneEnergy, transform, false);
+            OnHeadEnter += CollectOneEnergy;
+        }
+    }
+
+    private void HitPenetrableWall() {
+        OnHeadEnter -= HitPenetrableWall;
+        Destroy(item);
+        item = null;
+        World.HitPenetrableWall();
+    }
+
+    private void CollectOneEnergy() {
+        OnHeadEnter -= CollectOneEnergy;
+        Destroy(item);
+        item = null;
+        World.CollectOneEnergy();
     }
 
     private IEnumerator Glow() {
