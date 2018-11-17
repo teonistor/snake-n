@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,8 +10,7 @@ public class LevelSection : MonoBehaviour {
     [SerializeField] private Renderer tile;
     [SerializeField] private GameObject penetrableWall, impenetrableWall, oneEnergy;
 
-    internal delegate void Noarg ();
-    internal event Noarg OnHeadEnter;
+    internal event Action OnHeadEnter, OnCollectCollectible;
 
     private int snakePartsCurrentlyAbove = 0;
     private int i, j;
@@ -74,9 +74,25 @@ public class LevelSection : MonoBehaviour {
 
     internal void SpawnCollectible() { // Which collectible?
         if (item == null) {
-            item = Instantiate(oneEnergy, transform, false);
-            OnHeadEnter += CollectOneEnergy;
+            switch(type) {
+                case 'o':
+                    item = Instantiate(oneEnergy, transform, false);
+                    OnHeadEnter += CollectOneEnergy;
+                    break;
+                default:
+                    Debug.LogWarningFormat("Cannot spawn collectible for section type {0} ({1:D}, {2:D})", type, i, j);
+                    break;
+            }
         }
+    }
+
+    internal Action SpawnCollectible (float waitTime) {
+        return () => StartCoroutine(WaitThenSpawnCollectible(waitTime));
+    }
+
+    private IEnumerator WaitThenSpawnCollectible (float waitTime) {
+        yield return new WaitForSeconds(waitTime);
+        SpawnCollectible();
     }
 
     private void HitPenetrableWall() {
@@ -90,6 +106,7 @@ public class LevelSection : MonoBehaviour {
         OnHeadEnter -= CollectOneEnergy;
         Destroy(item);
         item = null;
+        OnCollectCollectible();
         World.CollectOneEnergy();
     }
 
@@ -103,10 +120,5 @@ public class LevelSection : MonoBehaviour {
             yield return wait;
         }
         m.color = end;
-    }
-
-    private IEnumerator RegenerateEnergy(float waitTime) {
-        yield return new WaitForSeconds(waitTime);
-        item = Instantiate(oneEnergy, transform, false);
     }
 }

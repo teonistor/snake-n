@@ -41,6 +41,29 @@ public class Level {
         for (int j = 0; j < OpeningMoves.Length; j++) {
             OpeningMoves[j] = int.Parse(openingMovesStr[j]);
         }
+        i++;
+
+
+        while (defRows[i].Length == 0) i++; // Reach beginning of collectible chain defs
+        for (; defRows[i].Length > 0; i++) {
+            string[] chain = defRows[i].Split(OneEmpty, StringSplitOptions.RemoveEmptyEntries);
+
+            // A chain is defined
+            if (chain[0].Contains(",")) {
+                for (int j=0; j<chain.Length; j++) {
+                    this[chain[j]].OnCollectCollectible += this[chain[(j + 1) % chain.Length]].SpawnCollectible;
+                }
+                this[chain[0]].SpawnCollectible();
+
+            // A timer is defined
+            } else {
+                float waitTime = float.Parse(chain[0]);
+                for (int j = 1; j < chain.Length; j++) {
+                    this[chain[j]].OnCollectCollectible += this[chain[j]].SpawnCollectible(waitTime);
+                    this[chain[j]].SpawnCollectible();
+                }
+            }
+        }
     }
 
     public LevelSection this[int i, int j] {
@@ -52,6 +75,11 @@ public class Level {
             return level[i, j];
         }
     }
+
+    private LevelSection this[string ij] { get {
+        string[] s = ij.Split(',');
+        return this[int.Parse(s[0]), int.Parse(s[1])];
+    }}
 
     public int GetLength (int v) {
         return level.GetLength(v);
