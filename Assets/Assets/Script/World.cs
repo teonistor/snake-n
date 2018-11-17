@@ -4,7 +4,7 @@ using System.Collections;
 using System;
 
 public class World : MonoBehaviour {
-    internal const float BaseTimeScale = 4f;
+    internal const float BaseTimeScale = 5.2f;
 
     const int OneEnergyPoints = 10;
     const int FullEnergyPoints = 50;
