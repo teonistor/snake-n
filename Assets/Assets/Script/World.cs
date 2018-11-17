@@ -37,10 +37,13 @@ public class World : MonoBehaviour {
 
     public static float CurrentLevelTimeLimit { get; private set; }
 
-    internal static float currentEnergy = 25;
+    internal static float currentEnergy = 25; // TODO magic number 25 used at least in 3 places
     internal static float targetEnergy = 25;
     internal static int currentLevelIndex = 0;
+    internal static int currentLives = 3;
     private static World Instance;
+
+    Coroutine mutex;
 
     void Awake () {
         Time.timeScale = BaseTimeScale;
@@ -89,7 +92,8 @@ public class World : MonoBehaviour {
         }
 
         if (currentEnergy <= 0 || Time.time > CurrentLevelTimeLimit) {
-            StartCoroutine(GameOver());
+            if (mutex == null)
+                mutex = StartCoroutine(GameOver());
         }
     }
 
@@ -123,6 +127,12 @@ public class World : MonoBehaviour {
         }
     }
 
+    public static void CollectLife () {
+        if (GameState == GameState.Playing) {
+            currentLives++;
+        }
+    }
+
     public static void HitPenetrableWall() {
         if (GameState == GameState.Playing)
             targetEnergy += PenetrableWallEnergy;
@@ -146,9 +156,14 @@ public class World : MonoBehaviour {
 
     IEnumerator GameOver () {
         GameState = GameState.GameOver;
-        currentLevelIndex = 0;
+        currentLives--;
         yield return new WaitForSeconds(9f);
-        SceneManager.LoadScene("Menu");
+        if (currentLives > 0) {
+            targetEnergy = currentEnergy = 25f;
+            SceneManager.LoadSceneAsync("One");
+        } else {
+            SceneManager.LoadScene("Menu");
+        }
     }
 
     private static void WorldToLevelCoords (int x, int z, out int i, out int j) {

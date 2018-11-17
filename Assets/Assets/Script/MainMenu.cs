@@ -7,7 +7,7 @@ public class MainMenu : MonoBehaviour {
     [SerializeField] GameObject resume, normalBottom, devToolBottom;
 
     void Start () {
-        if (World.currentLevelIndex > 0) { // TODO better condition
+        if (World.currentLives > 0 && World.currentLevelIndex > 0) { // TODO better condition; don't default-initialise in World?
             resume.SetActive(true);
         }
     }
@@ -27,6 +27,7 @@ public class MainMenu : MonoBehaviour {
 
     public void StartGame(int levelIndex = 0) {
         World.currentLevelIndex = levelIndex;
+        World.currentLives = 3;
         World.currentEnergy = World.targetEnergy = 25;
         SceneManager.LoadSceneAsync(1);
     }

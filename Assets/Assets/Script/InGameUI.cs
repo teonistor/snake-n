@@ -19,16 +19,13 @@ public class InGameUI : MonoBehaviour {
         smallBannerTemplate = smallBanner.text;
         initialProgressSize = progress.rectTransform.sizeDelta;
 
-        // TODO Timer, multiplier
-        timer.text = string.Format(timerTemplate, 3, 6);
-        multiplier.text = string.Format(multiplierTemplate, 1);
-
         smallBanner.text = string.Format(smallBannerTemplate, World.currentLevelIndex + 1);
         bigBanner.text = World.CurrentLevelName;
 	}
 
     void LateUpdate () {
         score.text = string.Format(scoreTemplate, World.CurrentPoints);
+        multiplier.text = string.Format(multiplierTemplate, World.currentLives);
         int remainingTime = Mathf.Max(0, (int)((World.CurrentLevelTimeLimit - Time.time) / World.BaseTimeScale + 1));
         timer.text = string.Format(timerTemplate, remainingTime / 60, remainingTime % 60);
 
