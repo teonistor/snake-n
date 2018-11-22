@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class HeadOverlord : AnimationOverlord {
+    internal static float ResetTurnIntsWait = 0.7f;
 
     // Movement
     public int currentX { get; private set; }
@@ -10,32 +11,9 @@ public class HeadOverlord : AnimationOverlord {
     public int nextX { get; private set; }
     public int nextZ { get; private set; }
 
-    private IEnumerator<int> ongoingOpeningMoves = null;
-
-    // Controls
-    private int LeftTurn {
-        get {
-            if (Input.GetKey(KeyCode.A)) return -1;
-            Rect r = new Rect(0, 0, Screen.width / 2, Screen.height);
-            for (var i = 0; i < Input.touchCount; i++) {
-                if (r.Contains(Input.GetTouch(i).position))
-                    return -1;
-            }
-            return 0;
-        }
-    }
-    private int RightTurn {
-        get {
-            if (Input.GetKey(KeyCode.D)) return 1;
-            Rect r = new Rect(Screen.width / 2, 0, Screen.width / 2, Screen.height);
-            for (var i = 0; i < Input.touchCount; i++) {
-                if (r.Contains(Input.GetTouch(i).position))
-                    return 1;
-            }
-            return 0;
-        }
-    }
-
+    private IEnumerator<int> inputEnumerator = null;
+    private Queue<int> inputBuffer = new Queue<int>();
+    
 
     /******
      * Tens digit represents were we're entering from
@@ -55,7 +33,47 @@ public class HeadOverlord : AnimationOverlord {
         NextTile ();
     }
 
-    internal override void NextTile () {
+    int LeftTurn { get {
+        if (Input.GetButtonDown("Left")) {
+            return -1;
+        }
+        else {
+            Rect r = new Rect(0, 0, Screen.width / 2, Screen.height);
+            for (var i = 0; i < Input.touchCount; i++) {
+                if (Input.GetTouch(i).phase==TouchPhase.Began && r.Contains(Input.GetTouch(i).position))
+                    return -1;
+            }
+        }
+
+        return 0;
+    }}
+
+    int RightTurn { get {
+        if (Input.GetButtonDown("Right")) {
+            return 1;
+        }
+        else {
+            Rect r = new Rect(Screen.width / 2, 0, Screen.width / 2, Screen.height);
+            for (var i = 0; i < Input.touchCount; i++) {
+                if (Input.GetTouch(i).phase == TouchPhase.Began && r.Contains(Input.GetTouch(i).position))
+                    return 1;
+            }
+        }
+
+        return 0;
+    }}
+
+    void Update () {
+        if (World.GameState == GameState.Playing) {
+            int inputAction = LeftTurn + RightTurn;
+            if (inputAction != 0)
+                inputBuffer.Enqueue(inputAction);
+        }
+    }
+
+    protected override void NextTile () {
+        base.NextTile();
+
         currentX = nextX;
         currentZ = nextZ;
         GenerateMovementCodeAndNextXZ();
@@ -89,25 +107,14 @@ public class HeadOverlord : AnimationOverlord {
     }
 
     private void GenerateMovementCodeAndNextXZ () {
-        int anyTurn = 0;
 
         if (World.GameState == GameState.Prologue) {
-            if (ongoingOpeningMoves == null)
-                ongoingOpeningMoves = OpeningMoves(World.CurrentLevelOpeningMoves);
-
-            if (ongoingOpeningMoves.MoveNext())
-                anyTurn = ongoingOpeningMoves.Current;
-            else
-                World.OpeningMovesFinished();
-        }
-        if (World.GameState == GameState.Playing) {
-            anyTurn = LeftTurn + RightTurn;
-        }
-        if (World.GameState == GameState.GameOver || World.GameState == GameState.LevelComplete) {
-            anyTurn = Random.Range(-1, 2);
+            if (inputEnumerator == null)
+                inputEnumerator = OpeningMoves(World.CurrentLevelOpeningMoves);
         }
 
-        int exitVia = (movementCode / 10 + 1 + anyTurn) % 4 + 1;
+        inputEnumerator.MoveNext();
+        int exitVia = (movementCode / 10 + 1 + inputEnumerator.Current) % 4 + 1;
 
         movementCode += exitVia;
         switch (exitVia) {
@@ -119,8 +126,20 @@ public class HeadOverlord : AnimationOverlord {
         }
     }
 
-    private static IEnumerator<int> OpeningMoves (int[] openingMoves) {
+    private IEnumerator<int> OpeningMoves (int[] openingMoves) {
         foreach (int move in openingMoves)
             yield return move;
+        World.OpeningMovesFinished();
+
+        while (World.GameState != GameState.GameOver && World.GameState != GameState.LevelComplete) {
+            if (inputBuffer.Count > 0)
+                yield return inputBuffer.Dequeue();
+            else
+                yield return 0;
+        }
+
+        while (true) {
+            yield return Random.Range(-3, 4) / 3;
+        }
     }
 }

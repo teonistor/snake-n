@@ -92,8 +92,9 @@ public class World : MonoBehaviour {
         }
 
         if (currentEnergy <= 0 || Time.time > CurrentLevelTimeLimit) {
-            if (mutex == null)
+            if (mutex == null) {
                 mutex = StartCoroutine(GameOver());
+            }
         }
     }
 
@@ -138,9 +139,17 @@ public class World : MonoBehaviour {
             targetEnergy += PenetrableWallEnergy;
     }
 
-    public static void HitSelfOrImpenetrableWall() {
-        if (GameState == GameState.Playing)
+    public static void HitSelfOrImpenetrableWall () {
+        if (GameState == GameState.Playing) {
             targetEnergy = 0;
+
+            // TODO move this to a logical place
+            foreach (Animation anim in FindObjectsOfType<Animation>()) {
+                foreach (AnimationState state in anim) {
+                    state.speed = 0f;
+                }
+            }
+        }
     }
 
     public static void OpeningMovesFinished () {

@@ -45,10 +45,9 @@ public class AnimationOverlord : MonoBehaviour {
         Animation.Play();
     }
 
-    internal virtual void NextTile () {}
+    protected virtual void NextTile () {}
 
-
-    public virtual void QuarterTile () { // TODO rename this
+    protected virtual void QuarterTile () { // TODO rename this
         if (indexInSnake < World.currentEnergy && tail == null) {
             tail = Instantiate(another, transform.parent).GetComponent<AnimationOverlord>();
             tail.indexInSnake = indexInSnake + 1;
