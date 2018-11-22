@@ -26,9 +26,7 @@ public class MainMenu : MonoBehaviour {
     }
 
     public void StartGame(int levelIndex = 0) {
-        World.currentLevelIndex = levelIndex;
-        World.currentLives = 3;
-        World.currentEnergy = World.targetEnergy = 25;
+        World.StartGame(levelIndex);
         SceneManager.LoadSceneAsync(1);
     }
 

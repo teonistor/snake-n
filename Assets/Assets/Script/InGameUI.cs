@@ -11,7 +11,7 @@ public class InGameUI : MonoBehaviour {
 
     private string scoreTemplate, timerTemplate, multiplierTemplate, smallBannerTemplate;
     private Vector2 initialProgressSize;
-    
+
 	void Start () {
         scoreTemplate = score.text;
         timerTemplate = timer.text;
@@ -26,12 +26,12 @@ public class InGameUI : MonoBehaviour {
     void LateUpdate () {
         score.text = string.Format(scoreTemplate, World.CurrentPoints);
         multiplier.text = string.Format(multiplierTemplate, World.currentLives);
-        int remainingTime = Mathf.Max(0, (int)((World.CurrentLevelTimeLimit - Time.time) / World.BaseTimeScale + 1));
+        int remainingTime = Mathf.Max(0, (int)(World.CurrentLevelTimeLimit - Time.time + 1));
         timer.text = string.Format(timerTemplate, remainingTime / 60, remainingTime % 60);
 
         Vector2 progressSize = initialProgressSize;
         progressSize.x = progressSize.x * (World.CurrentLevelRequiredPoints - World.CurrentPoints) / World.CurrentLevelRequiredPoints;
-        progress.rectTransform.sizeDelta = Vector2.MoveTowards(progress.rectTransform.sizeDelta, progressSize, Time.deltaTime * 100f);
+        progress.rectTransform.sizeDelta = Vector2.MoveTowards(progress.rectTransform.sizeDelta, progressSize, Time.deltaTime * 500f);
 
         switch(World.GameState) {
             //case 

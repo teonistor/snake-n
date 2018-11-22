@@ -18,17 +18,29 @@ public class AnimationOverlord : MonoBehaviour {
 
     void Awake() {
         Animation = GetComponent<Animation>();
+        World.OnSpeedChange += UpdateAnimationSpeed;
     }
 
-    void Start () {
+    protected virtual void Start () {
+        UpdateAnimationSpeed();
         NextTile ();
 	}
 	
-	void Update () {
+	protected virtual void Update () {
         if (indexInSnake >= World.currentEnergy && tail != null && tail.tail == null) {
             tail.currentSection.Leave();
             Destroy(tail.gameObject);
             tail = null;
+        }
+    }
+
+    void OnDisable () {
+        World.OnSpeedChange -= UpdateAnimationSpeed;
+    }
+
+    void UpdateAnimationSpeed() {
+        foreach(AnimationState state in Animation) {
+            state.speed = World.CurrentTotalSpeed;
         }
     }
 

@@ -25,12 +25,13 @@ public class HeadOverlord : AnimationOverlord {
      */
     private int movementCode;
 
-    void Start () {
+    protected virtual void Start () {
         indexInSnake = 0;
         //Animation = GetComponent<Animation>();
         movementCode = 30; // Arbitrary?
         nextZ = 1; // As above
-        NextTile ();
+
+        base.Start();
     }
 
     int LeftTurn { get {
@@ -63,12 +64,14 @@ public class HeadOverlord : AnimationOverlord {
         return 0;
     }}
 
-    void Update () {
+    protected override void Update () {
         if (World.GameState == GameState.Playing) {
             int inputAction = LeftTurn + RightTurn;
             if (inputAction != 0)
                 inputBuffer.Enqueue(inputAction);
         }
+
+        base.Update();
     }
 
     protected override void NextTile () {

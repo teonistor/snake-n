@@ -4,7 +4,10 @@ using System.Collections;
 using System;
 
 public class World : MonoBehaviour {
-    internal const float BaseTimeScale = 5.2f;
+    internal const float initialSpeed = 5.2f;
+    internal const float initialEnergy = 25f;
+    internal const float speedIncrementBig = 1.25f;
+    internal const float speedIncrementSmall = 0.5f;
 
     const int OneEnergyPoints = 10;
     const int FullEnergyPoints = 50;
@@ -37,16 +40,44 @@ public class World : MonoBehaviour {
 
     public static float CurrentLevelTimeLimit { get; private set; }
 
-    internal static float currentEnergy = 25; // TODO magic number 25 used at least in 3 places
-    internal static float targetEnergy = 25;
+    internal static float CurrentBaseSpeed { get {
+            return _curBaseSpeed;
+        } private set {
+            _curBaseSpeed = value;
+            if (OnSpeedChange != null) OnSpeedChange();
+        }
+    }
+
+    internal static float CurrentInputSpeed { get {
+            return _curInputSpeed;
+        } private set {
+            _curInputSpeed = value;
+            if (OnSpeedChange != null) OnSpeedChange();
+        }
+    }
+
+    public static float CurrentTotalSpeed { get {
+        return CurrentBaseSpeed + CurrentInputSpeed;
+    }}
+
+    internal static float currentEnergy = initialEnergy;
+    internal static float targetEnergy = initialEnergy;
     internal static int currentLevelIndex = 0;
     internal static int currentLives = 3;
     private static World Instance;
 
+    static float _curBaseSpeed = initialSpeed;
+    static float _curInputSpeed = 0f;
+    static float minSpeed = 3.4f;
+    static float maxSpeed = 7f;
+    internal static event Action OnSpeedChange;
+
     Coroutine mutex;
 
     void Awake () {
-        Time.timeScale = BaseTimeScale;
+        Time.timeScale = 1f;
+        if (CurrentBaseSpeed == 0f)
+            CurrentBaseSpeed = initialSpeed;
         GameState = GameState.Prologue;
 
         Instance = this;
@@ -65,32 +96,45 @@ public class World : MonoBehaviour {
             currentLevelIndex = 0;
         }
         currentLevel = new Level(levelDefs[currentLevelIndex].text);
-
-        // TODO fix for speed variability
-        CurrentLevelTimeLimit = Time.time + currentLevel.Timeout * BaseTimeScale;
-        //Debug.Break();
+        
+        CurrentLevelTimeLimit = Time.time + currentLevel.Timeout;
     }
 
     void Update() {
+
+        // Input: Pause/cancel
         if (Input.GetButtonDown("Cancel")) {
             if (GameState == GameState.Playing) {
                 GameState = GameState.Paused;
                 Time.timeScale = 0f;
             } else if (GameState == GameState.Paused) {
                 GameState = GameState.Playing;
-                Time.timeScale = BaseTimeScale;
+                Time.timeScale = 1f;
             }
         }
 
-
+        // Input: Accelerate/slow
+        // TODO restrict how long this effect lasts - perhaps in another class...
+        if (Input.GetButtonDown("Fast")) {
+            CurrentInputSpeed = speedIncrementBig;
+        } else if (Input.GetButtonDown("Slow")) {
+            CurrentInputSpeed = -speedIncrementBig;
+        } else if (Input.GetButtonUp("Slow") || Input.GetButtonUp("Fast")) {
+            CurrentInputSpeed = 0f;
+        }
+        
+        // Slowly reduce snake length
+        // n.b. seems a regular framerate is too slow for this anyway...
         if (currentEnergy != targetEnergy) {
-            currentEnergy = Mathf.MoveTowards(currentEnergy, targetEnergy, Time.deltaTime * 10);
+            currentEnergy = Mathf.MoveTowards(currentEnergy, targetEnergy, Time.deltaTime * 66);
         }
 
+        // Check level completed
         if (CurrentPoints > CurrentLevelRequiredPoints) {
             StartCoroutine(NextLevel());
         }
 
+        // Check death (only launch coroutine once)
         if (currentEnergy <= 0 || Time.time > CurrentLevelTimeLimit) {
             if (mutex == null) {
                 mutex = StartCoroutine(GameOver());
@@ -111,6 +155,13 @@ public class World : MonoBehaviour {
         int i, j;
         WorldToLevelCoords(x, z, out i, out j);
         return currentLevel[i, j]; // Rightfully assuming the head has already been wherever a body part is entering, we need not explicitly ensure the level section exists at that location
+    }
+
+    public static void StartGame (int levelIndex = 0) {
+        currentLevelIndex = levelIndex;
+        currentLives = 3;
+        currentEnergy = targetEnergy = initialEnergy;
+        CurrentBaseSpeed = initialSpeed;
     }
 
     public static void CollectOneEnergy () {
@@ -134,21 +185,32 @@ public class World : MonoBehaviour {
         }
     }
 
+    public static void CollectSpeedUp () {
+        if (GameState == GameState.Playing && CurrentBaseSpeed < maxSpeed) {
+            CurrentBaseSpeed += speedIncrementSmall;
+        }
+    }
+
+    public static void CollectSpeedDown () {
+        if (GameState == GameState.Playing && CurrentBaseSpeed > minSpeed) {
+            CurrentBaseSpeed -= speedIncrementSmall;
+        }
+    }
+
     public static void HitPenetrableWall() {
-        if (GameState == GameState.Playing)
+        if (GameState == GameState.Playing) {
             targetEnergy += PenetrableWallEnergy;
+            if (targetEnergy < 0f) {
+                targetEnergy = 0f;
+                CurrentBaseSpeed = 0f;
+            }
+        }
     }
 
     public static void HitSelfOrImpenetrableWall () {
         if (GameState == GameState.Playing) {
-            targetEnergy = 0;
-
-            // TODO move this to a logical place
-            foreach (Animation anim in FindObjectsOfType<Animation>()) {
-                foreach (AnimationState state in anim) {
-                    state.speed = 0f;
-                }
-            }
+            targetEnergy = 0f;
+            CurrentBaseSpeed = 0f;
         }
     }
 
@@ -158,7 +220,7 @@ public class World : MonoBehaviour {
 
     IEnumerator NextLevel () {
         GameState = GameState.LevelComplete;
-        yield return new WaitForSeconds(9f);
+        yield return new WaitForSeconds(1.8f);
         currentLevelIndex++;
         SceneManager.LoadScene("One");
     }
@@ -166,9 +228,9 @@ public class World : MonoBehaviour {
     IEnumerator GameOver () {
         GameState = GameState.GameOver;
         currentLives--;
-        yield return new WaitForSeconds(9f);
+        yield return new WaitForSeconds(1.8f);
         if (currentLives > 0) {
-            targetEnergy = currentEnergy = 25f;
+            targetEnergy = currentEnergy = initialEnergy;
             SceneManager.LoadSceneAsync("One");
         } else {
             SceneManager.LoadScene("Menu");
