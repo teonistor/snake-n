@@ -12,7 +12,7 @@ public class Level {
     internal int[] OpeningMoves { get; private set; }
 
     private IList<string> levelDef;
-    private LevelSection[,] level;
+    private LevelTile[,] level;
 
     public Level (string definition) {
         definition.Replace("\r", ""); // Protect ourselves from Windows-style line endings
@@ -32,7 +32,7 @@ public class Level {
             levelDef.Add(defRows[i]);
         }
 
-        level = new LevelSection[levelDef.Count, levelDef[0].Length];
+        level = new LevelTile[levelDef.Count, levelDef[0].Length];
         Debug.Log("Initialising level " + Name + " of size " + levelDef.Count + " x " + levelDef[0].Length);
 
         while (defRows[i].Length == 0) i++; // Reach beginning of opening moves
@@ -66,7 +66,7 @@ public class Level {
         }
     }
 
-    public LevelSection this[int i, int j] {
+    public LevelTile this[int i, int j] {
         get {
             if (level[i, j] == null) {
                 level[i, j] = World.InstantiateLevelSection();
@@ -76,7 +76,7 @@ public class Level {
         }
     }
 
-    private LevelSection this[string ij] { get {
+    private LevelTile this[string ij] { get {
         string[] s = ij.Split(',');
         return this[int.Parse(s[0]), int.Parse(s[1])];
     }}

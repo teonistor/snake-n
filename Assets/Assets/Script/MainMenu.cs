@@ -43,7 +43,7 @@ public class MainMenu : MonoBehaviour {
         string[] cmd = devToolBottom.GetComponentInChildren<InputField>().text.ToLower().Split(Level.OneEmpty, System.StringSplitOptions.RemoveEmptyEntries);
         switch (cmd[0]) {
             case "startfrom": StartGame(int.Parse(cmd[1])); break;
-            case "turnwait": HeadOverlord.ResetTurnIntsWait = float.Parse(cmd[1]); break;
+            case "turnwait": SnakeHead.ResetTurnIntsWait = float.Parse(cmd[1]); break;
         }
 
         devToolBottom.GetComponentInChildren<InputField>().text = "";

@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LevelSection : MonoBehaviour {
+public class LevelTile : MonoBehaviour {
 
     [SerializeField] private float energyRegeneration;
     [SerializeField] private Material m1, m2, m3;

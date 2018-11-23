@@ -1,181 +1,148 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
-public class SnakeHead : MonoBehaviour {
+public class SnakeHead : SnakePart {
+    internal static float ResetTurnIntsWait = 0.7f;
 
-    static readonly float incr = 0.1f, deltaDistSq = 0.01f;
-    static readonly Vector3 scale = new Vector3(0.41f, 0.41f, 0.06f);
-    static readonly Quaternion rot = Quaternion.AngleAxis(45, Vector3.back);
+    // Movement
+    public int currentX { get; private set; }
+    public int currentZ { get; private set; }
+    public int nextX { get; private set; }
+    public int nextZ { get; private set; }
 
-    [SerializeField] private Material snake;
-    [SerializeField] private GameObject snakeBodyPart;
-    [SerializeField] private int _maxParts = 10;
-    [SerializeField] private float speed = 1f;
-
-    //private bool LeftTurn {
-    //    get {
-    //        return _leftTurn || Input.GetKey(KeyCode.A);
-    //    } set {
-    //        _leftTurn = value;
-    //    }
-    //}
-    //private bool RightTurn {
-    //    get {
-    //        return _rightTurn || Input.GetKey(KeyCode.D);
-    //    } set {
-    //        _rightTurn = value;
-    //    }
-    //}
-
-    private bool LeftTurn { get {
-        if (Input.GetKey(KeyCode.A)) return true;
-        Rect r = new Rect(0, 0, Screen.width / 2, Screen.height);
-        for (var i=0; i< Input.touchCount; i++) {
-            if (r.Contains(Input.GetTouch(i).position))
-                return true;
-        }
-        return false;
-    } }
-    private bool RightTurn { get {
-        if (Input.GetKey(KeyCode.D)) return true;
-        Rect r = new Rect(Screen.width / 2, 0, Screen.width / 2, Screen.height);
-        for (var i=0; i< Input.touchCount; i++) {
-            if (r.Contains(Input.GetTouch(i).position))
-                return true;
-        }
-        return false;
-    } }
-
-    public int MaxParts { get { return _maxParts; } }
-    public float DeltaMove { get; private set; }
-
-    //private List<Vector3> pts;
-    private Vector3 lastPos, lastInstruction;
-    private SnakePart next;
-    private bool _rightTurn;
-    private bool _leftTurn;
-
-    public void TouchLeft () {
-        //_leftTurn = true;
-    }
-    public void TouchRight () {
-        //_rightTurn = true;
-    }
-
-    void Start () {
-        //leftTurn = rightTurn = false;
-        StartCoroutine(Move());
-
-        //pts = new List<Vector3> {
-        //    new Vector3(0, 0.6f, 0),
-        //    new Vector3(0, 0.6f, -1),
-        //    new Vector3(0, 0.6f, -2),
-        //    new Vector3(1, 0.6f, -2),
-        //    new Vector3(1, 0.6f, -3)
-        //};
-       
-        lastPos = transform.position;
-        next = MakePart();
-        next.Init(this, transform, 1);
-        lastInstruction = transform.position;
-    }
-
-    public SnakePart MakePart (Transform prevPart = null) {
-        if (prevPart == null) prevPart = transform;
-        return Instantiate(snakeBodyPart, prevPart.position, Quaternion.identity).GetComponent<SnakePart>();
-    }
-
-    void Update () {
-        DeltaMove = (transform.position - lastPos).magnitude;
-        lastPos = transform.position;
-
-        if ((transform.position - lastInstruction).sqrMagnitude > deltaDistSq) {
-            lastInstruction = transform.position;
-            next.Instruct(transform.position, transform.rotation);
-        }
-
-        if (Input.GetKey(KeyCode.Escape)) {
-            SceneManager.LoadSceneAsync(0);
-        }
-    }
+    private IEnumerator<int> inputEnumerator = null;
+    private Queue<int> inputBuffer = new Queue<int>();
     
-    private IEnumerator Move () {
-        Vector3 anchor, sinFactor, cosFactor, ea;
-        float a, omega;
-        int turnFactor;
-        WaitForEndOfFrame wait = new WaitForEndOfFrame();
 
-        yield return new WaitForSeconds(2f);
+    /******
+     * Tens digit represents were we're entering from
+     * Units digit represents were we're headed
+     * 1 = North
+     * 2 = East
+     * 3 = South
+     * 4 = West
+     */
+    private int movementCode;
+
+    protected virtual void Start () {
+        indexInSnake = 0;
+        //Animation = GetComponent<Animation>();
+        movementCode = 30; // Arbitrary?
+        nextZ = 1; // As above
+
+        base.Start();
+    }
+
+    int LeftTurn { get {
+        if (Input.GetButtonDown("Left")) {
+            return -1;
+        }
+        else {
+            Rect r = new Rect(0, 0, Screen.width / 2, Screen.height);
+            for (var i = 0; i < Input.touchCount; i++) {
+                if (Input.GetTouch(i).phase==TouchPhase.Began && r.Contains(Input.GetTouch(i).position))
+                    return -1;
+            }
+        }
+
+        return 0;
+    }}
+
+    int RightTurn { get {
+        if (Input.GetButtonDown("Right")) {
+            return 1;
+        }
+        else {
+            Rect r = new Rect(Screen.width / 2, 0, Screen.width / 2, Screen.height);
+            for (var i = 0; i < Input.touchCount; i++) {
+                if (Input.GetTouch(i).phase == TouchPhase.Began && r.Contains(Input.GetTouch(i).position))
+                    return 1;
+            }
+        }
+
+        return 0;
+    }}
+
+    protected override void Update () {
+        if (World.GameState == GameState.Playing) {
+            int inputAction = LeftTurn + RightTurn;
+            if (inputAction != 0)
+                inputBuffer.Enqueue(inputAction);
+        }
+
+        base.Update();
+    }
+
+    protected override void NextTile () {
+        base.NextTile();
+
+        currentX = nextX;
+        currentZ = nextZ;
+        GenerateMovementCodeAndNextXZ();
+
+        LevelTile section = World.SnakeHeadEnters(currentX, currentZ, movementCode);
+        section.Enter(true);
+        Instruct(section, GetAppropriateClip());
+
+        currentX = nextX;
+        currentZ = nextZ;
+        movementCode = ((movementCode % 10 + 1) % 4 + 1) * 10;
+    }
+
+    private AnimationClip GetAppropriateClip () {
+        //print("Movement code " + movementCode);
+        switch (movementCode) {
+            case 21: return clips[0];
+            case 23: return clips[1];
+            case 24: return clips[2];
+            case 12: return clips[3];
+            case 13: return clips[4];
+            case 14: return clips[5];
+            case 32: return clips[6];
+            case 31: return clips[7];
+            case 34: return clips[8];
+            case 42: return clips[9];
+            case 41: return clips[10];
+            case 43: return clips[11];
+            default: Debug.LogWarning("Unexpected movementCode: " + movementCode); return clips[0];
+        }
+    }
+
+    private void GenerateMovementCodeAndNextXZ () {
+
+        if (World.GameState == GameState.Prologue) {
+            if (inputEnumerator == null)
+                inputEnumerator = OpeningMoves(World.CurrentLevelOpeningMoves);
+        }
+
+        inputEnumerator.MoveNext();
+        int exitVia = (movementCode / 10 + 1 + inputEnumerator.Current) % 4 + 1;
+
+        movementCode += exitVia;
+        switch (exitVia) {
+            case 1: nextZ++; break;
+            case 2: nextX++; break;
+            case 3: nextZ--; break;
+            case 4: nextX--; break;
+            default: Debug.LogWarning("Unexpected exitVia: " + exitVia); break;
+        }
+    }
+
+    private IEnumerator<int> OpeningMoves (int[] openingMoves) {
+        foreach (int move in openingMoves)
+            yield return move;
+        World.OpeningMovesFinished();
+
+        while (World.GameState != GameState.GameOver && World.GameState != GameState.LevelComplete) {
+            if (inputBuffer.Count > 0)
+                yield return inputBuffer.Dequeue();
+            else
+                yield return 0;
+        }
 
         while (true) {
-            if (LeftTurn == RightTurn) {
-                //LeftTurn = RightTurn = false;
-
-                // Move forward
-                anchor = transform.position;
-
-                print("Anchor " + anchor);
-
-                for (a = 0f; a < 1f; a += speed * Time.deltaTime) {
-                    transform.position = anchor + a * transform.forward;
-                    yield return wait;
-                }
-                transform.position = anchor + transform.forward;
-
-
-            }
-            else {
-                omega = 2 * speed; // Angular velocity
-                ea = transform.eulerAngles;
-                sinFactor = transform.forward * 0.5f;
-
-                if (LeftTurn) {
-                    //LeftTurn = false;
-                    turnFactor = -1;
-                }
-                else {
-                    //RightTurn = false;
-                    turnFactor = 1;
-                }
-                cosFactor = transform.right * -0.5f * turnFactor;
-                anchor = transform.position - cosFactor;
-
-                print("Anchor " + anchor + " sinF " + sinFactor + " cosF " + cosFactor + " pos " + transform.position);
-
-                for (a = 0f; a < 0.5 * Mathf.PI; a += omega * Time.deltaTime) {
-                    transform.position = anchor + Mathf.Cos(a) * cosFactor + Mathf.Sin(a) * sinFactor;
-                    transform.eulerAngles = new Vector3(ea.x, ea.y + turnFactor * a * Mathf.Rad2Deg, ea.z);
-                    yield return wait;
-                }
-                transform.position = anchor + sinFactor;
-                transform.eulerAngles = new Vector3(ea.x, ea.y + turnFactor * 90f, ea.z);
-            }
+            yield return Random.Range(-3, 4) / 3;
         }
-    }
-
-    public void Die() {
-        StartCoroutine(DeathAnimation());
-    }
-
-    private IEnumerator DeathAnimation() {
-        speed = 0f;
-        WaitForSeconds wait = new WaitForSeconds(0.033333f);
-
-        int originalPartCount = _maxParts;
-        for (float t = 1f; t >= 0f; t -= 0.066666f) {
-            _maxParts = (int)(t * originalPartCount);
-            yield return wait;
-        }
-        _maxParts = 0;
-
-        Vector3 originalScale = transform.localScale;
-        for (float t = 1f; t >= 0f; t -= 0.066666f) {
-            transform.localScale = t * originalScale;
-            yield return wait;
-        }
-        Destroy(gameObject);
     }
 }

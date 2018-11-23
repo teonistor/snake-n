@@ -142,16 +142,16 @@ public class World : MonoBehaviour {
         }
     }
 
-    public static LevelSection InstantiateLevelSection() {
-        return Instantiate(Instance.levelSectionTile, Instance.transform).GetComponent<LevelSection>();
+    public static LevelTile InstantiateLevelSection() {
+        return Instantiate(Instance.levelSectionTile, Instance.transform).GetComponent<LevelTile>();
     }
 
-    public static LevelSection SnakeHeadEnters (int x, int z, int movementCode) {
+    public static LevelTile SnakeHeadEnters (int x, int z, int movementCode) {
         MoveView(x, z, movementCode);
         return SnakeBodyEnters(x, z);
     }
 
-    public static LevelSection SnakeBodyEnters (int x, int z) {
+    public static LevelTile SnakeBodyEnters (int x, int z) {
         int i, j;
         WorldToLevelCoords(x, z, out i, out j);
         return currentLevel[i, j]; // Rightfully assuming the head has already been wherever a body part is entering, we need not explicitly ensure the level section exists at that location

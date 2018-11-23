@@ -1,68 +1,72 @@
 ﻿using System.Collections;
-using System;
+using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(Animation))]
 public class SnakePart : MonoBehaviour {
-    static readonly int NO_COLLISION_COUNT = 10;
+    
+    [SerializeField] internal AnimationClip[] clips;
 
-    private SnakeHead head;
-    private Vector3 destPos;
-    private Quaternion destRot;
-    private SnakePart next;
-    private Transform previous;
-    public bool noInstruction { get; private set; }
-    public int partCount { get; private set; }
+    [SerializeField] internal GameObject another;
 
-    private int MaxParts { get {
-        return head.MaxParts;
-    } }
+    LevelTile currentSection;
 
-	public void Init (SnakeHead head, Transform previous, int partCount) {
-        this.head = head;
-        this.previous = previous;
-        noInstruction = true;
-        this.partCount = partCount;
+    protected int indexInSnake;
+    SnakePart tail = null;
 
-        // Activate self-collision
-        if (partCount > NO_COLLISION_COUNT) {
-            gameObject.layer = 10;
-        }
-	}
+    public Animation Animation { get; internal set; }
 
-    public void Instruct (Vector3 destPos, Quaternion destRot) {
-        noInstruction = false;
-        //print("Instruct snak p " + partCount + " to go to " + destPos);
-        if (next) {
-            next.Instruct(this.destPos, this.destRot);
-        } else if (partCount < MaxParts) {
-            next = head.MakePart(transform);
-            next.Init(head, transform, partCount + 1);
-        }
-
-        this.destPos = destPos;
-        this.destRot = destRot;
+    void Awake() {
+        Animation = GetComponent<Animation>();
+        World.OnSpeedChange += UpdateAnimationSpeed;
     }
 
-	void Update () {
-        if (MaxParts < partCount) {
-            Destroy(gameObject);
-            return;
+    protected virtual void Start () {
+        UpdateAnimationSpeed();
+        NextTile ();
+	}
+	
+	protected virtual void Update () {
+        if (indexInSnake >= World.currentEnergy && tail != null && tail.tail == null) {
+            tail.currentSection.Leave();
+            Destroy(tail.gameObject);
+            tail = null;
+        }
+    }
+
+    void OnDisable () {
+        World.OnSpeedChange -= UpdateAnimationSpeed;
+    }
+
+    void UpdateAnimationSpeed() {
+        foreach(AnimationState state in Animation) {
+            state.speed = World.CurrentTotalSpeed;
+        }
+    }
+
+    internal void Instruct(LevelTile section, AnimationClip clip) {
+        Animation.Stop();
+        if (currentSection != null)
+            currentSection.Leave();
+
+        currentSection = section;
+        transform.parent = section.transform;
+
+        currentSection.Enter();
+        Animation.clip = clip;
+        Animation.Play();
+    }
+
+    protected virtual void NextTile () {}
+
+    protected virtual void QuarterTile () { // TODO rename this
+        if (indexInSnake < World.currentEnergy && tail == null) {
+            tail = Instantiate(another, transform.parent).GetComponent<SnakePart>();
+            tail.indexInSnake = indexInSnake + 1;
         }
 
-        if (noInstruction) return;
-
-        //print("SnakePart update moving from " + transform.position + " to " + destPos + " by " + head.DeltaMove);
-        Vector3 pos = Vector3.MoveTowards(transform.position, destPos, head.DeltaMove);
-        Vector3 ea = new Vector3(0f, Vector3.SignedAngle(Vector3.right, previous.position - (next == null ? transform : next.transform).position, Vector3.up), 0f);
-        //float t = (pos - transform.position).sqrMagnitude / (destPos - transform.position).sqrMagnitude;
-        //transform.rotation = Quaternion.Lerp(transform.rotation, destRot, t);
-        transform.position = pos;
-        transform.eulerAngles = ea;
-        //transform.position = destPos;
-	}
-
-    void OnTriggerEnter (Collider other) {
-        print("Snake bit its tail");
-        head.Die();
+        if (tail != null) {
+            tail.Instruct(currentSection, Animation.clip);
+        }
     }
 }
