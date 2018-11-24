@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(MeshRenderer), typeof(MeshFilter))]
+[ExecuteInEditMode]
 public class CreateMesh : MonoBehaviour {
 
     [SerializeField] private float r = 0.13f, d = 0.15f, l = 0.11f;
@@ -76,8 +77,4 @@ public class CreateMesh : MonoBehaviour {
     //    d = 0.1f + 0.03f * Mathf.Sin(Time.time * 2 + defer);
     //    D = 0.12f + 0.04f * Mathf.Sin(Time.time* 2 + defer);
     //}
-
-	void Update () {
-
-    }
 }
