@@ -22,6 +22,7 @@ public class ScrollTexture : MonoBehaviour {
     }
 
     internal void Stop () {
+        print("Call stop");
         scrolling = false;
     }
 
