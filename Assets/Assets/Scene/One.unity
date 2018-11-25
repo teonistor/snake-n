@@ -152,10 +152,6 @@ Prefab:
       propertyPath: m_RootOrder
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 1916452587086290, guid: d92b2efa4e47e8247a11f8f616f086b8, type: 2}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: d92b2efa4e47e8247a11f8f616f086b8, type: 2}
   m_IsPrefabParent: 0
@@ -168,7 +164,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1800431467}
   - component: {fileID: 1800431466}
-  - component: {fileID: 1800431468}
   m_Layer: 0
   m_Name: World
   m_TagString: Untagged
@@ -203,17 +198,3 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1800431468
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1800431465}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fbf037c54ad51314996278c29bfaa1a2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  xSpeed: 1.5
-  ySpeed: 0.6
-  materialToScroll: {fileID: 2100000, guid: a4bea9758f1653c4fa8ddf0848731313, type: 2}
