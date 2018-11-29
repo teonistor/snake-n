@@ -8,6 +8,7 @@ public class World : MonoBehaviour {
     internal const float initialEnergy = 25f;
     internal const float speedIncrementBig = 1.25f;
     internal const float speedIncrementSmall = 0.5f;
+    internal const float maxInputSpeedStamina = 1.5f;
 
     const int OneEnergyPoints = 10;
     const int FullEnergyPoints = 50;
@@ -64,6 +65,7 @@ public class World : MonoBehaviour {
     internal static float targetEnergy = initialEnergy;
     internal static int currentLevelIndex = 0;
     internal static int currentLives = 3;
+    internal static float currentInputSpeedStamina = maxInputSpeedStamina;
     private static World Instance;
 
     static float _curBaseSpeed = initialSpeed;
@@ -113,8 +115,7 @@ public class World : MonoBehaviour {
             }
         }
 
-        // Input: Accelerate/slow
-        // TODO restrict how long this effect lasts - perhaps in another class...
+        // Input: Accelerate/slow: controls
         if (Input.GetButtonDown("Fast")) {
             CurrentInputSpeed = speedIncrementBig;
         } else if (Input.GetButtonDown("Slow")) {
@@ -122,7 +123,17 @@ public class World : MonoBehaviour {
         } else if (Input.GetButtonUp("Slow") || Input.GetButtonUp("Fast")) {
             CurrentInputSpeed = 0f;
         }
-        
+
+        // Input: Accelerate/slow: stamina limitation enforcement
+        if (CurrentInputSpeed == 0f) {
+            if (currentInputSpeedStamina < maxInputSpeedStamina)
+                currentInputSpeedStamina += Time.deltaTime;
+        } else if (currentInputSpeedStamina > 0f) {
+            currentInputSpeedStamina -= Time.deltaTime;
+        } else {
+            CurrentInputSpeed = 0f;
+        }
+
         // Slowly reduce snake length
         // n.b. seems a regular framerate is too slow for this anyway...
         if (currentEnergy != targetEnergy) {
