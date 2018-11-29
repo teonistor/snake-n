@@ -1,43 +1,72 @@
 ﻿using System.Collections;
-using System;
+using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(Animation))]
 public class SnakePart : MonoBehaviour {
+    
+    [SerializeField] internal AnimationClip[] clips;
 
-    private TestSnake head;
-    private Rigidbody headRb;
-    private Vector3 destPos;
-    private Quaternion destRot;
-    private SnakePart next;
-    private int partCount;
+    [SerializeField] internal GameObject another;
 
-    private int MaxParts { get {
-        return head.MaxParts;
-    } }
+    LevelTile currentSection;
 
-	public void Init (TestSnake head, int partCount) {
-        this.head = head;
-        this.partCount = partCount;
-        headRb = head.GetComponent<Rigidbody>();
+    protected int indexInSnake;
+    SnakePart tail = null;
 
+    public Animation Animation { get; internal set; }
+
+    void Awake() {
+        Animation = GetComponent<Animation>();
+        World.OnSpeedChange += UpdateAnimationSpeed;
+    }
+
+    protected virtual void Start () {
+        UpdateAnimationSpeed();
+        NextTile ();
 	}
-
-    public void Instruct (Vector3 destPos, Quaternion destRot) {
-        this.destPos = destPos;
-        this.destRot = destRot;
-        if (next) {
-            next.Instruct(transform.position, transform.rotation);
-        } else if (partCount < MaxParts) {
-            next = head.MakePart(transform);
-            next.Init(head, partCount + 1);
+	
+	protected virtual void Update () {
+        if (indexInSnake >= World.currentEnergy && tail != null && tail.tail == null) {
+            tail.currentSection.Leave();
+            Destroy(tail.gameObject);
+            tail = null;
         }
     }
 
-	void Update () {
-        //print("SnakePart update moving from " + transform.position + " to " + destPos + " by " + head.DeltaMove);
-        Vector3 pos = Vector3.MoveTowards(transform.position, destPos, head.DeltaMove);
-        float t = (pos - transform.position).sqrMagnitude / (destPos - transform.position).sqrMagnitude;
-        transform.rotation = Quaternion.Lerp(transform.rotation, destRot, t);
-        transform.position = pos;
-	}
+    void OnDisable () {
+        World.OnSpeedChange -= UpdateAnimationSpeed;
+    }
+
+    void UpdateAnimationSpeed() {
+        foreach(AnimationState state in Animation) {
+            state.speed = World.CurrentTotalSpeed;
+        }
+    }
+
+    internal void Instruct(LevelTile section, AnimationClip clip) {
+        Animation.Stop();
+        if (currentSection != null)
+            currentSection.Leave();
+
+        currentSection = section;
+        transform.parent = section.transform;
+
+        currentSection.Enter();
+        Animation.clip = clip;
+        Animation.Play();
+    }
+
+    protected virtual void NextTile () {}
+
+    protected virtual void QuarterTile () { // TODO rename this
+        if (indexInSnake < World.currentEnergy && tail == null) {
+            tail = Instantiate(another, transform.parent).GetComponent<SnakePart>();
+            tail.indexInSnake = indexInSnake + 1;
+        }
+
+        if (tail != null) {
+            tail.Instruct(currentSection, Animation.clip);
+        }
+    }
 }
