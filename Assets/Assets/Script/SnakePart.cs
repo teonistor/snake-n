@@ -69,4 +69,13 @@ public class SnakePart : MonoBehaviour {
             tail.Instruct(currentSection, Animation.clip);
         }
     }
+
+    public void AppendHoverMeshVertices(List<Vector3> vertices) {
+        Vector3 pos = transform.position;
+        vertices.Add(pos + transform.right * -0.4f);
+        vertices.Add(pos + transform.up * 0.4f);
+        vertices.Add(pos + transform.right * 0.4f);
+        if (tail != null)
+            tail.AppendHoverMeshVertices(vertices);
+    }
 }
