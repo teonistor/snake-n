@@ -8,7 +8,7 @@ public class LevelTile : MonoBehaviour {
     [SerializeField] private float energyRegeneration;
     [SerializeField] private Material m1, m2, m3;
     [SerializeField] private Renderer tile;
-    [SerializeField] private GameObject penetrableWall, impenetrableWall, oneEnergy;
+    [SerializeField] private GameObject penetrableWall, impenetrableWall, oneEnergy, speedUp, speedDown;
 
     internal event Action OnHeadEnter, OnCollectCollectible;
 
@@ -19,7 +19,7 @@ public class LevelTile : MonoBehaviour {
     private GameObject item;
 
     void Awake () {
-        OnHeadEnter = () => { };
+        OnHeadEnter = () => StartCoroutine(Glow());
     }
 
     public void Init(int i, int j, char type) {
@@ -31,8 +31,6 @@ public class LevelTile : MonoBehaviour {
             case 'X': item = Instantiate(impenetrableWall, transform, false); break;
             case 'x': item = Instantiate(penetrableWall, transform, false);
                       OnHeadEnter += HitPenetrableWall; break;
-            //case 'o': item = Instantiate(oneEnergy, transform, false); break;
-                //default : tile.material = m1; break;
         }
     }
 
@@ -52,7 +50,6 @@ public class LevelTile : MonoBehaviour {
             }
 
             OnHeadEnter();
-            StartCoroutine(Glow());
 
             //if (type == 'o') {
             //    if (item) {
@@ -62,7 +59,7 @@ public class LevelTile : MonoBehaviour {
             //    }
             //}
 
-        // Since head extends part, Enter will be called twice by the head entering, once with the flag true and once false
+        // Since head extends part and Enter will be called twice by the head entering, once with the flag true and once false
         } else {
             snakePartsCurrentlyAbove++;
         }
@@ -78,6 +75,14 @@ public class LevelTile : MonoBehaviour {
                 case 'o':
                     item = Instantiate(oneEnergy, transform, false);
                     OnHeadEnter += CollectOneEnergy;
+                    break;
+                case '+':
+                    item = Instantiate(speedUp, transform, false);
+                    OnHeadEnter += CollectSpeedUp;
+                    break;
+                case '-':
+                    item = Instantiate(speedDown, transform, false);
+                    OnHeadEnter += CollectSpeedDown;
                     break;
                 default:
                     Debug.LogWarningFormat("Cannot spawn collectible for section type {0} ({1:D}, {2:D})", type, i, j);
@@ -102,12 +107,28 @@ public class LevelTile : MonoBehaviour {
         World.HitPenetrableWall();
     }
 
-    private void CollectOneEnergy() {
+    private void CollectOneEnergy () {
         OnHeadEnter -= CollectOneEnergy;
         Destroy(item);
         item = null;
         OnCollectCollectible();
         World.CollectOneEnergy();
+    }
+
+    private void CollectSpeedUp () {
+        OnHeadEnter -= CollectSpeedUp;
+        Destroy(item);
+        item = null;
+        OnCollectCollectible();
+        World.CollectSpeedUp();
+    }
+
+    private void CollectSpeedDown () {
+        OnHeadEnter -= CollectSpeedDown;
+        Destroy(item);
+        item = null;
+        OnCollectCollectible();
+        World.CollectSpeedDown();
     }
 
     private IEnumerator Glow() {

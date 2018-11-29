@@ -148,3 +148,5 @@ MonoBehaviour:
   impenetrableWall: {fileID: 1215076826989024, guid: f1ec998c2b39255418cbe396e2d400eb,
     type: 2}
   oneEnergy: {fileID: 1964297355764058, guid: 76af9e8a3753c8a4096d594c733e1e4f, type: 2}
+  speedUp: {fileID: 1901111138882924, guid: f21644896b1236046af734b07ecd5da9, type: 2}
+  speedDown: {fileID: 1517279856751042, guid: a5fe813966d184645822207a62b58c6f, type: 2}
