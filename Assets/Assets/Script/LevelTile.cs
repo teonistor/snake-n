@@ -15,6 +15,8 @@ public class LevelTile : MonoBehaviour {
     private int snakePartsCurrentlyAbove = 0;
     private int i, j;
     private char type;
+    private Color normal;
+    private Material material;
 
     private GameObject item;
 
@@ -22,7 +24,7 @@ public class LevelTile : MonoBehaviour {
         OnHeadEnter = () => StartCoroutine(Glow());
     }
 
-    public void Init(int i, int j, char type) {
+    public void Init(int i, int j, char type, int axisSum) {
         this.i = i;
         this.j = j;
         this.type = type;
@@ -32,6 +34,10 @@ public class LevelTile : MonoBehaviour {
             case 'x': item = Instantiate(penetrableWall, transform, false);
                       OnHeadEnter += HitPenetrableWall; break;
         }
+
+        material = tile.material;
+        normal = material.color.RotateHSV((i + j) * 2f / axisSum);
+        material.color = normal;
     }
 
 	void Start () {
@@ -132,14 +138,23 @@ public class LevelTile : MonoBehaviour {
     }
 
     private IEnumerator Glow() {
-        Material m = tile.material;
-        Color end = m.color;
-        Color start = Color.Lerp(end, Color.white, 0.8f);
+        Color bright = Color.Lerp(normal, Color.white, 0.8f);
         WaitForSeconds wait = new WaitForSeconds(1f / 30);
         for (float t=0f; t<1f; t += 1f / 60) {
-            m.color = Color.Lerp(start, end, t);
+            material.color = Color.Lerp(bright, normal, t);
             yield return wait;
         }
-        m.color = end;
+        material.color = normal;
+    }
+}
+
+internal static class ColorHsvRotate {
+    internal static Color RotateHSV (this Color color, float t) {
+        float h, s, v;
+        Color.RGBToHSV(color, out h, out s, out v);
+        h += t;
+        while (h > 1f) h -= 1f;
+        Debug.Log("H=" + h);
+        return Color.HSVToRGB(h, s, v);
     }
 }

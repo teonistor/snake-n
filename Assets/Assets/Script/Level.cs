@@ -70,7 +70,7 @@ public class Level {
         get {
             if (level[i, j] == null) {
                 level[i, j] = World.InstantiateLevelSection();
-                level[i, j].Init(i, j, levelDef[i][j]);
+                level[i, j].Init(i, j, levelDef[i][j], levelDef.Count+levelDef[0].Length);
             }
             return level[i, j];
         }
