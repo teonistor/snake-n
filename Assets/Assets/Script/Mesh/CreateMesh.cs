@@ -42,7 +42,7 @@ public class CreateMesh : MonoBehaviour {
             new Vector2(0.5f, 1f),
             new Vector2(  1f, 0f),
             new Vector2(  1f, 1f),
-            new Vector2(  1f, 0f),
+            new Vector2(  0f, 1f),
             new Vector2(  1f, 1f)
         };
         mesh.triangles = new int[] {
@@ -61,7 +61,9 @@ public class CreateMesh : MonoBehaviour {
              6, 10,  5,
              5, 10,  9,
              5,  9,  4,
-             4,  9,  8
+             4,  9,  8,
+             8,  9, 10,
+             8, 10, 11
         };
         mesh.RecalculateNormals();
         mesh.RecalculateTangents();
