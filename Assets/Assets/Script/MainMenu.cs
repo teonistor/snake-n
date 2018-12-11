@@ -21,7 +21,7 @@ public class MainMenu : MonoBehaviour {
         //    GoproAcclr.speed = f;
         //}
 
-     public void ContinueGame () {
+    public void ContinueGame () {
         SceneManager.LoadSceneAsync(1);
     }
 
