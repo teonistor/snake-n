@@ -13,7 +13,7 @@ public class World : MonoBehaviour {
     const int OneEnergyPoints = 10;
     const int FullEnergyPoints = 50;
     const int OneEnergyEnergy = 7;
-    const int MaximumEnergy = 66;
+    const int MaximumEnergy = 55;
     const int PenetrableWallEnergy = -15;
     const int viewCentreShift = 4;
 
@@ -82,6 +82,13 @@ public class World : MonoBehaviour {
     Coroutine changeSkyRepeatedly; // Don't make static
 
     void Awake () {
+        string s = "150";
+        for (int i = 0; i < 35; i++)
+            for (int j = 0; j < 35; j++)
+                if ((i * 2 % 5 + 1) % 5 == j % 5)
+                    s += " " + i + "," + j;
+        print(s);
+
         Time.timeScale = 1f;
         if (CurrentBaseSpeed == 0f)
             CurrentBaseSpeed = initialSpeed;
