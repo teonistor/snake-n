@@ -111,6 +111,7 @@ public class LevelTile : MonoBehaviour {
         Destroy(item);
         item = null;
         World.HitPenetrableWall();
+        SoundEffects.BreakWall();
     }
 
     private void CollectOneEnergy () {

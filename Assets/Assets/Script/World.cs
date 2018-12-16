@@ -165,6 +165,7 @@ public class World : MonoBehaviour {
         // Sky change to red and back when time limit approaching
         if (Time.time+5f > CurrentLevelTimeLimit && changeSkyRepeatedly == null && GameState == GameState.Playing) {
             changeSkyRepeatedly = StartCoroutine(ChangeSkyRepeatedly(skyTimeUp));
+            SoundEffects.TimeApproaching();
         }
     }
 
@@ -195,6 +196,7 @@ public class World : MonoBehaviour {
             CurrentPoints += OneEnergyPoints;
             currentEnergy = targetEnergy =
                 Mathf.Min(targetEnergy + OneEnergyEnergy, MaximumEnergy);
+            SoundEffects.CollectOneEnergy();
         }
     }
 
@@ -214,12 +216,14 @@ public class World : MonoBehaviour {
     public static void CollectSpeedUp () {
         if (GameState == GameState.Playing && CurrentBaseSpeed < maxSpeed) {
             CurrentBaseSpeed += speedIncrementSmall;
+            SoundEffects.CollectSpeedUp();
         }
     }
 
     public static void CollectSpeedDown () {
         if (GameState == GameState.Playing && CurrentBaseSpeed > minSpeed) {
             CurrentBaseSpeed -= speedIncrementSmall;
+            SoundEffects.CollectSpeedDown();
         }
     }
 
@@ -246,6 +250,7 @@ public class World : MonoBehaviour {
     }
 
     IEnumerator NextLevel () {
+        SoundEffects.Win();
         GameState = GameState.LevelComplete;
         StartCoroutine(ChangeSkyOnce(skyLevelComplete));
 
@@ -255,6 +260,7 @@ public class World : MonoBehaviour {
     }
 
     IEnumerator GameOver () {
+        SoundEffects.Lose();
         GameState = GameState.GameOver;
         StartCoroutine(ChangeSkyOnce(skyNoControl));
         currentLives--;
