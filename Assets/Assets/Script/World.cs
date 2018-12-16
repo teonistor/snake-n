@@ -83,6 +83,7 @@ public class World : MonoBehaviour {
 
     void Awake () {
         Time.timeScale = 1f;
+        CurrentBaseSpeed = initialSpeed;
         if (CurrentBaseSpeed == 0f)
             CurrentBaseSpeed = initialSpeed;
         GameState = GameState.Prologue;
@@ -246,6 +247,7 @@ public class World : MonoBehaviour {
         SoundEffects.Win();
         GameState = GameState.LevelComplete;
         StartCoroutine(ChangeSkyOnce(skyLevelComplete));
+        currentLives++;
 
         yield return new WaitForSeconds(2.1f);
         currentLevelIndex++;
