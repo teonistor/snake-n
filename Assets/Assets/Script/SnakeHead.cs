@@ -34,7 +34,7 @@ public class SnakeHead : SnakePart {
         base.Start();
     }
 
-    int LeftTurn { get {
+    internal static int LeftTurn { get {
         if (Input.GetButtonDown("Left")) {
             return -1;
         }
@@ -49,7 +49,7 @@ public class SnakeHead : SnakePart {
         return 0;
     }}
 
-    int RightTurn { get {
+    internal static int RightTurn { get {
         if (Input.GetButtonDown("Right")) {
             return 1;
         }

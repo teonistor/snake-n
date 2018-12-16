@@ -21,6 +21,13 @@ public class MainMenu : MonoBehaviour {
         //    GoproAcclr.speed = f;
         //}
 
+    void Update () {
+        switch (SnakeHead.LeftTurn + SnakeHead.RightTurn) {
+            case -1: StartGame(); break;
+            case 1: QuitGame(); break;
+        }
+    }
+
     public void ContinueGame () {
         SceneManager.LoadSceneAsync(1);
     }

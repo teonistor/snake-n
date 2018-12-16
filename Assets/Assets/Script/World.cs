@@ -82,13 +82,6 @@ public class World : MonoBehaviour {
     Coroutine changeSkyRepeatedly; // Don't make static
 
     void Awake () {
-        string s = "150";
-        for (int i = 0; i < 35; i++)
-            for (int j = 0; j < 35; j++)
-                if ((i * 2 % 5 + 1) % 5 == j % 5)
-                    s += " " + i + "," + j;
-        print(s);
-
         Time.timeScale = 1f;
         if (CurrentBaseSpeed == 0f)
             CurrentBaseSpeed = initialSpeed;
@@ -128,23 +121,23 @@ public class World : MonoBehaviour {
         }
 
         // Input: Accelerate/slow: controls
-        if (Input.GetButtonDown("Fast")) {
-            CurrentInputSpeed = speedIncrementBig;
-        } else if (Input.GetButtonDown("Slow")) {
-            CurrentInputSpeed = -speedIncrementBig;
-        } else if (Input.GetButtonUp("Slow") || Input.GetButtonUp("Fast")) {
-            CurrentInputSpeed = 0f;
-        }
+        //if (Input.GetButtonDown("Fast")) {
+        //    CurrentInputSpeed = speedIncrementBig;
+        //} else if (Input.GetButtonDown("Slow")) {
+        //    CurrentInputSpeed = -speedIncrementBig;
+        //} else if (Input.GetButtonUp("Slow") || Input.GetButtonUp("Fast")) {
+        //    CurrentInputSpeed = 0f;
+        //}
 
         // Input: Accelerate/slow: stamina limitation enforcement
-        if (CurrentInputSpeed == 0f) {
-            if (currentInputSpeedStamina < maxInputSpeedStamina)
-                currentInputSpeedStamina += Time.deltaTime;
-        } else if (currentInputSpeedStamina > 0f) {
-            currentInputSpeedStamina -= Time.deltaTime;
-        } else {
-            CurrentInputSpeed = 0f;
-        }
+        //if (CurrentInputSpeed == 0f) {
+        //    if (currentInputSpeedStamina < maxInputSpeedStamina)
+        //        currentInputSpeedStamina += Time.deltaTime;
+        //} else if (currentInputSpeedStamina > 0f) {
+        //    currentInputSpeedStamina -= Time.deltaTime;
+        //} else {
+        //    CurrentInputSpeed = 0f;
+        //}
 
         // Slowly reduce snake length
         // FIXME seems a regular framerate is too slow for this anyway...
