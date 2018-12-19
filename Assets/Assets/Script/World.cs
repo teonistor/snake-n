@@ -13,9 +13,14 @@ public class World : MonoBehaviour {
     const int OneEnergyPoints = 10;
     const int FullEnergyPoints = 50;
     const int OneEnergyEnergy = 7;
-    const int MaximumEnergy = 66;
+    const int MaximumEnergy = 55;
     const int PenetrableWallEnergy = -15;
     const int viewCentreShift = 4;
+
+    internal static readonly Color skyNormal = new Color(0.8f, 0.8f, 0.8f);
+    internal static readonly Color skyNoControl = new Color(0.06574395f, 0.2440461f, 0.2794118f);
+    internal static readonly Color skyTimeUp = new Color(0.9f, 0.2f, 0.3f);
+    internal static readonly Color skyLevelComplete = new Color(0.25f, 0.5f, 0.25f);
 
     [SerializeField] private GameObject levelSectionTile;
     [SerializeField] private int viewRadius; // 9 would do for a start
@@ -74,10 +79,11 @@ public class World : MonoBehaviour {
     static float maxSpeed = 7f;
     internal static event Action OnSpeedChange;
 
-    Coroutine mutex;
+    Coroutine changeSkyRepeatedly; // Don't make static
 
     void Awake () {
         Time.timeScale = 1f;
+        CurrentBaseSpeed = initialSpeed;
         if (CurrentBaseSpeed == 0f)
             CurrentBaseSpeed = initialSpeed;
         GameState = GameState.Prologue;
@@ -116,40 +122,44 @@ public class World : MonoBehaviour {
         }
 
         // Input: Accelerate/slow: controls
-        if (Input.GetButtonDown("Fast")) {
-            CurrentInputSpeed = speedIncrementBig;
-        } else if (Input.GetButtonDown("Slow")) {
-            CurrentInputSpeed = -speedIncrementBig;
-        } else if (Input.GetButtonUp("Slow") || Input.GetButtonUp("Fast")) {
-            CurrentInputSpeed = 0f;
-        }
+        //if (Input.GetButtonDown("Fast")) {
+        //    CurrentInputSpeed = speedIncrementBig;
+        //} else if (Input.GetButtonDown("Slow")) {
+        //    CurrentInputSpeed = -speedIncrementBig;
+        //} else if (Input.GetButtonUp("Slow") || Input.GetButtonUp("Fast")) {
+        //    CurrentInputSpeed = 0f;
+        //}
 
         // Input: Accelerate/slow: stamina limitation enforcement
-        if (CurrentInputSpeed == 0f) {
-            if (currentInputSpeedStamina < maxInputSpeedStamina)
-                currentInputSpeedStamina += Time.deltaTime;
-        } else if (currentInputSpeedStamina > 0f) {
-            currentInputSpeedStamina -= Time.deltaTime;
-        } else {
-            CurrentInputSpeed = 0f;
-        }
+        //if (CurrentInputSpeed == 0f) {
+        //    if (currentInputSpeedStamina < maxInputSpeedStamina)
+        //        currentInputSpeedStamina += Time.deltaTime;
+        //} else if (currentInputSpeedStamina > 0f) {
+        //    currentInputSpeedStamina -= Time.deltaTime;
+        //} else {
+        //    CurrentInputSpeed = 0f;
+        //}
 
         // Slowly reduce snake length
-        // n.b. seems a regular framerate is too slow for this anyway...
+        // FIXME seems a regular framerate is too slow for this anyway...
         if (currentEnergy != targetEnergy) {
             currentEnergy = Mathf.MoveTowards(currentEnergy, targetEnergy, Time.deltaTime * 66);
         }
 
-        // Check level completed
-        if (CurrentPoints > CurrentLevelRequiredPoints) {
+        // Check level completed (only launch coroutine once)
+        if (CurrentPoints > CurrentLevelRequiredPoints && GameState==GameState.Playing) {
             StartCoroutine(NextLevel());
         }
 
         // Check death (only launch coroutine once)
-        if (currentEnergy <= 0 || Time.time > CurrentLevelTimeLimit) {
-            if (mutex == null) {
-                mutex = StartCoroutine(GameOver());
-            }
+        if ((currentEnergy <= 0 || Time.time > CurrentLevelTimeLimit) && GameState == GameState.Playing) {
+            StartCoroutine(GameOver());
+        }
+
+        // Sky change to red and back when time limit approaching
+        if (Time.time+5f > CurrentLevelTimeLimit && changeSkyRepeatedly == null && GameState == GameState.Playing) {
+            changeSkyRepeatedly = StartCoroutine(ChangeSkyRepeatedly(skyTimeUp));
+            SoundEffects.TimeApproaching();
         }
     }
 
@@ -180,6 +190,7 @@ public class World : MonoBehaviour {
             CurrentPoints += OneEnergyPoints;
             currentEnergy = targetEnergy =
                 Mathf.Min(targetEnergy + OneEnergyEnergy, MaximumEnergy);
+            SoundEffects.CollectOneEnergy();
         }
     }
 
@@ -199,12 +210,14 @@ public class World : MonoBehaviour {
     public static void CollectSpeedUp () {
         if (GameState == GameState.Playing && CurrentBaseSpeed < maxSpeed) {
             CurrentBaseSpeed += speedIncrementSmall;
+            SoundEffects.CollectSpeedUp();
         }
     }
 
     public static void CollectSpeedDown () {
         if (GameState == GameState.Playing && CurrentBaseSpeed > minSpeed) {
             CurrentBaseSpeed -= speedIncrementSmall;
+            SoundEffects.CollectSpeedDown();
         }
     }
 
@@ -227,25 +240,61 @@ public class World : MonoBehaviour {
 
     public static void OpeningMovesFinished () {
         GameState = GameState.Playing;
+        Instance.StartCoroutine(ChangeSkyOnce(skyNormal));
     }
 
     IEnumerator NextLevel () {
+        SoundEffects.Win();
         GameState = GameState.LevelComplete;
-        yield return new WaitForSeconds(1.8f);
+        StartCoroutine(ChangeSkyOnce(skyLevelComplete));
+        currentLives++;
+
+        yield return new WaitForSeconds(2.1f);
         currentLevelIndex++;
         SceneManager.LoadScene("One");
     }
 
     IEnumerator GameOver () {
+        SoundEffects.Lose();
         GameState = GameState.GameOver;
+        StartCoroutine(ChangeSkyOnce(skyNoControl));
         currentLives--;
-        yield return new WaitForSeconds(1.8f);
+
+        yield return new WaitForSeconds(2.2f);
         if (currentLives > 0) {
             targetEnergy = currentEnergy = initialEnergy;
             SceneManager.LoadSceneAsync("One");
         } else {
             SceneManager.LoadScene("Menu");
         }
+    }
+
+    static IEnumerator ChangeSkyOnce (Color target, float duration=0.4f) {
+        WaitForSeconds wait = new WaitForSeconds(1 / 30f);
+        Color start = RenderSettings.ambientSkyColor;
+        for (float t=0f; t < 1f; t += 1/ 30f / duration) {
+            RenderSettings.ambientSkyColor = Color.Lerp(start, target, t);
+            yield return wait;
+        }
+        RenderSettings.ambientSkyColor = target;
+    }
+
+    static IEnumerator ChangeSkyRepeatedly (Color target, float duration=0.5f) {
+        WaitForSeconds wait = new WaitForSeconds(1 / 30f);
+        Color start = RenderSettings.ambientSkyColor;
+        while (GameState == GameState.Playing) {
+            for (float t = 0f; t < 1f && GameState == GameState.Playing; t += 1 / 30f / duration) {
+                RenderSettings.ambientSkyColor = Color.Lerp(start, target, t);
+                yield return wait;
+            }
+            for (float t = 1f; t > 0f && GameState == GameState.Playing; t -= 1 / 30f / duration) {
+                RenderSettings.ambientSkyColor = Color.Lerp(start, target, t);
+                yield return wait;
+            }
+        }
+        // This whole hack of sky-changing routines is hacky and relies on correct but unclear assumptions
+        // changeSkyRepeatedly = null;
+        RenderSettings.ambientSkyColor = target;
     }
 
     private static void WorldToLevelCoords (int x, int z, out int i, out int j) {

@@ -111,6 +111,7 @@ public class LevelTile : MonoBehaviour {
         Destroy(item);
         item = null;
         World.HitPenetrableWall();
+        SoundEffects.BreakWall();
     }
 
     private void CollectOneEnergy () {
@@ -154,7 +155,6 @@ internal static class ColorHsvRotate {
         Color.RGBToHSV(color, out h, out s, out v);
         h += t;
         while (h > 1f) h -= 1f;
-        Debug.Log("H=" + h);
         return Color.HSVToRGB(h, s, v);
     }
 }

@@ -7,9 +7,10 @@ public class MainMenu : MonoBehaviour {
     [SerializeField] GameObject resume, normalBottom, devToolBottom;
 
     void Start () {
-        if (World.currentLives > 0 && World.currentLevelIndex > 0) { // TODO better condition; don't default-initialise in World?
-            resume.SetActive(true);
-        }
+        //if (World.currentLives > 0 && World.currentLevelIndex > 0) { // TODO better condition; don't default-initialise in World?
+        //    resume.SetActive(true);
+        //}
+        Input.simulateMouseWithTouches = false;
     }
         //public void ChangeQuality () {
         //    int i = int.Parse(inputField.text);
@@ -21,7 +22,14 @@ public class MainMenu : MonoBehaviour {
         //    GoproAcclr.speed = f;
         //}
 
-     public void ContinueGame () {
+    void Update () {
+        switch (SnakeHead.LeftTurn + SnakeHead.RightTurn) {
+            case -1: StartGame(); break;
+            case 1: QuitGame(); break;
+        }
+    }
+
+    public void ContinueGame () {
         SceneManager.LoadSceneAsync(1);
     }
 
