@@ -82,12 +82,12 @@ public class World : MonoBehaviour {
     Coroutine changeSkyRepeatedly; // Don't make static
 
     void Awake () {
-        string s = "150";
-        for (int i = 0; i < 35; i++)
-            for (int j = 0; j < 35; j++)
-                if ((i * 2 % 5 + 1) % 5 == j % 5)
-                    s += " " + i + "," + j;
-        print(s);
+        //string s = "150";
+        //for (int i = 0; i < 35; i++)
+        //    for (int j = 0; j < 35; j++)
+        //        if ((i * 2 % 5 + 1) % 5 == j % 5)
+        //            s += " " + i + "," + j;
+        //print(s);
 
         Time.timeScale = 1f;
         if (CurrentBaseSpeed == 0f)
